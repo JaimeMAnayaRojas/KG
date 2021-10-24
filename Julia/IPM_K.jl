@@ -34,6 +34,11 @@ end
 cd("$(homedir())")
 cd("Dropbox/Projects_JM/FSU/Pool_manipulation/Pool_R/")
 pwd()
+
+# Get the parameters
+
+post = CSV.read("Posteriors.csv", DataFrame)
+
 ##
 # IPM code... it works but the values are higher than in R, I am not sure why,
 # since the values from the functions give virtually, the same results. I think,
@@ -408,7 +413,10 @@ res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
 res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
 
 CSV.write("K_lamda.est.csv", res_IPM)
-
+CSV.write("K_survMat.csv", surv_mat)
+CSV.write("K_growMat.csv", grow_mat)
+CSV.write("K_fecMat.csv", fec_mat)
+CSV.write("K_rczMat.csv", rcz_mat)
 
 ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
 # p_val = (mapcols(x -> boot_p(x), Δ13C_net))

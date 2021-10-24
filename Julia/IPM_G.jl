@@ -32,8 +32,13 @@ end
 
 
 cd("$(homedir())")
-cd("Dropbox/Projects_JM/FSU/Pool_manipulation/Pool_R/")
+cd("Dropbox/Projects_JM/FSU/Pool_manipulation/KG_git/")
 pwd()
+
+# Get the parameters
+
+post = CSV.read("Posteriors.csv", DataFrame)
+
 ##
 # IPM code... it works but the values are higher than in R, I am not sure why,
 # since the values from the functions give virtually, the same results. I think,
@@ -58,20 +63,6 @@ meshpts = z1
 size_cen = (18.0)
 typeof(size_cen)
 
-# Get the parameters
-
-R""" 
-getwd()
-posteriors <- readRDS("Posteriors_KG.RDS")
-
-post <- as.data.frame(posteriors)
-
-
-""";
-# get the posteriros into Julia
-@rget post;
-
-first(post,6)
 
 
 
@@ -431,7 +422,11 @@ res_IPM.p_grow = res_IPM.grow_con ./ res_IPM.sum_con
 res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
 res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
 
-CSV.write("G_lamda.est.csv", res_IPM)
+CSV.write("G_survMat.csv", surv_mat)
+CSV.write("G_growMat.csv", grow_mat)
+CSV.write("G_fecMat.csv", fec_mat)
+CSV.write("G_rczMat.csv", rcz_mat)
+
 
 
 ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
