@@ -282,7 +282,7 @@ res_IPM = select(res_IPM, :x1 => "lam_GR", :x2 => "lam_NG", :x3 => "delta_lam",
 
 row = 1
 
-@time for row in 1: 5 #size(pars_GR_K)[1]
+@time for row in 1:size(pars_GR_K)[1]
     # Make projection kernels
 	IPM_GR = mk_K(pars_GR_K, z1, z, size_cen, row, 0.7)
 	IPM_NG = mk_K(pars_NG_K, z1, z, size_cen, row, 0.7)
@@ -413,10 +413,10 @@ res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
 res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
 
 CSV.write("K_lamda.est.csv", res_IPM)
-CSV.write("K_survMat.csv", surv_mat)
-CSV.write("K_growMat.csv", grow_mat)
-CSV.write("K_fecMat.csv", fec_mat)
-CSV.write("K_rczMat.csv", rcz_mat)
+CSV.write("K_survMat.csv", DataFrame(surv_mat, :auto))
+CSV.write("K_growMat.csv", DataFrame(grow_mat, :auto))
+CSV.write("K_fecMat.csv", DataFrame(fec_mat, :auto))
+CSV.write("K_rczMat.csv", DataFrame(rcz_mat, :auto))
 
 ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
 # p_val = (mapcols(x -> boot_p(x), Δ13C_net))

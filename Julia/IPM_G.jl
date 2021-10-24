@@ -422,10 +422,11 @@ res_IPM.p_grow = res_IPM.grow_con ./ res_IPM.sum_con
 res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
 res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
 
-CSV.write("G_survMat.csv", DataFrame(surv_mat))
-CSV.write("G_growMat.csv", DataFrame(grow_mat))
-CSV.write("G_fecMat.csv", DataFrame(fec_mat))
-CSV.write("G_rczMat.csv", DataFrame(rcz_mat))
+CSV.write("G_survMat.csv", DataFrame(surv_mat, :auto))
+CSV.write("G_growMat.csv", DataFrame(grow_mat, :auto))
+CSV.write("G_fecMat.csv", DataFrame(fec_mat, :auto))
+CSV.write("G_rczMat.csv", DataFrame(rcz_mat, :auto))
+CSV.write("G_lamda.est.csv", res_IPM)
 
 
 
