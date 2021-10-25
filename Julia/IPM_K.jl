@@ -140,7 +140,7 @@ first(pars_NG_K, 6)
 first(pars_GR_K, 6)
 
 df = nothing
-function g_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+function g_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
   α= df.α_grow[row]
   β= df.βz_grow[row]
   σ= df.σ_grow[row]
@@ -161,7 +161,7 @@ end
 
 
 row=1
-@time g = g_z1z(pars_GR_K, z1, z, size_cen, row)
+@time g = g_z1zK(pars_GR_K, z1, z, size_cen, row)
 
 # columns should sum to 1
 sum.(eachcol(g))
@@ -169,7 +169,7 @@ sum.(eachcol(g))
 
 ## Surival function
 row = 1
-function s_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+function s_zK(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
   α= df.α_surv[row]
   β= df.βz_surv[row]
   linear_p = α .+ β * (z .- size_cen)       # linear predictor
@@ -180,8 +180,8 @@ function s_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, 
   return(matex)
 end
 
-s_z(pars_GR_K, z, size_cen, 1)
-sum.(eachcol(s_z(pars_GR_K, z, size_cen, 1)))
+s_zK(pars_GR_K, z, size_cen, 1)
+sum.(eachcol(s_zK(pars_GR_K, z, size_cen, 1)))
 
 ## Reproduction function, logistic regression
 # function pb_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
@@ -196,7 +196,7 @@ sum.(eachcol(s_z(pars_GR_K, z, size_cen, 1)))
 
 
 ## Recruitment function (N.B - from birth in spring to first summer), logistic regression
-function pr_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+function pr_zK(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
   α= df.α_fec[row]
   β= df.βz_fec[row]
   linear_p = α .+ β * (z .- size_cen)  .* (1/2)     # linear predictor
@@ -207,10 +207,10 @@ function pr_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat,
   return(matex)
 
 end
-pr_z(pars_GR_K, z, size_cen, 1)
+pr_zK(pars_GR_K, z, size_cen, 1)
 
 ## Recruit size function
-function c_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+function c_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
   #α= df.rcz_int[row]
   #β= df.rcz_z[row]
   σ= 0.6 #pars.rcz_sd[row]
@@ -226,43 +226,43 @@ function c_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, siz
   p_den_grow[2:end, 1] =  pdf.(Normal(μ, σ), z).*h
   return(p_den_grow)
 end
-c_z1z(pars_GR_K, z1, z, size_cen, row)
+c_z1zK(pars_GR_K, z1, z, size_cen, row)
 
 ##----------------------------------------------------
 ## Functions to build IPM kernels P, F, and K
 
-function P_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
-  out = g_z1z(df, z1, z, size_cen, row) * s_z(df, z, size_cen, row)
+function P_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+  out = g_z1zK(df, z1, z, size_cen, row) * s_zK(df, z, size_cen, row)
   return(out)
 
 end
 
-P_z1z(pars_GR_K, z1, z, size_cen, 1)
+P_z1zK(pars_GR_K, z1, z, size_cen, 1)
 
 
-function F_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
-#	out1 = c_z1z(df, z1, z, size_cen, row)
-	out2 = pr_z(df, z, size_cen, row) * s_z(df, z, size_cen, row)
+function F_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
+#	out1 = c_z1zK(df, z1, z, size_cen, row)
+	out2 = pr_zK(df, z, size_cen, row) * s_zK(df, z, size_cen, row)
 	out = out2
 	return(out)
   
 end
 
-F_z1z(pars_GR_K, z1, z, size_cen, 1)
+F_z1zK(pars_GR_K, z1, z, size_cen, 1)
 
-function mk_K(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer, V::AbstractFloat)
-  F = F_z1z(df, z1, z, size_cen, row)
-  P = P_z1z(df, z1, z, size_cen, row)
-  A = (P + F) + V .* c_z1z(df, z1, z, size_cen, row)
+function mk_KK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer, V::AbstractFloat)
+  F = F_z1zK(df, z1, z, size_cen, row)
+  P = P_z1zK(df, z1, z, size_cen, row)
+  A = (P + F) + V .* c_z1zK(df, z1, z, size_cen, row)
   K = A * A
   out = Dict("K"=> K, "meshpts" => z, "P" => P, "F"=> F, "A" => "A")
   return(out)
 end
 
-mk_K(pars_GR_K, z1, z, size_cen, 1, 0.7)
+mk_KK(pars_GR_K, z1, z, size_cen, 1, 0.7)
 
 # Matrices for vital rates
-surv_mat = zeros(size(pars_GR_K)[1], nBigMatrix)+1)
+surv_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 grow_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 rep_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 fec_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
@@ -277,15 +277,14 @@ res_IPM = DataFrame(zeros(size(pars_GR_K)[1], 15), :auto)
 res_IPM = select(res_IPM, :x1 => "lam_GR", :x2 => "lam_NG", :x3 => "delta_lam",
 					:x4 => "sum_lam_eff", :x5 => "grow_con", :x6 => "fec_con", 
 					:x7 => "rcz_con", :x8 => "sur_con",
-					:x9 => "sum_con", :x10 => "p_grow", :x11 => "p_fec", 
-					:x12 => "p_rcz", :x13 => "p_sur")
+					:x9 => "sum_con")
 
 row = 1
 
 @time for row in 1:size(pars_GR_K)[1]
     # Make projection kernels
-	IPM_GR = mk_K(pars_GR_K, z1, z, size_cen, row, 0.7)
-	IPM_NG = mk_K(pars_NG_K, z1, z, size_cen, row, 0.7)
+	IPM_GR = mk_KK(pars_GR_K, z1, z, size_cen, row, 0.7)
+	IPM_NG = mk_KK(pars_NG_K, z1, z, size_cen, row, 0.7)
     # calculate the population growth rate (λ)
 
 	vv_GR = eigen(IPM_GR["K"])
@@ -332,18 +331,18 @@ row = 1
 	one_mat = ones(nBigMatrix+1, nBigMatrix+1)
 
     # Function differences
-	Δ_grow = g_z1z(pars_NG_K, z1, z, size_cen, row) - g_z1z(pars_GR_K, z1, z, size_cen, row)
+	Δ_grow = g_z1zK(pars_NG_K, z1, z, size_cen, row) - g_z1zK(pars_GR_K, z1, z, size_cen, row)
 	#Δ_rep = one_mat*(pb_z(pars_NG_K, z, size_cen, row) - pb_z(pars_GR_K, z, size_cen, row))
-	Δ_fec = one_mat*(pr_z(pars_NG_K, z, size_cen, row) - pr_z(pars_GR_K, z, size_cen, row))
-	Δ_rcz = (c_z1z(pars_NG_K, z1, z, size_cen, row) - c_z1z(pars_GR_K, z1, z, size_cen, row))
-	Δ_sur = one_mat*(s_z(pars_NG_K, z, size_cen, row) - s_z(pars_GR_K, z, size_cen, row))
+	Δ_fec = one_mat*(pr_zK(pars_NG_K, z, size_cen, row) - pr_zK(pars_GR_K, z, size_cen, row))
+	Δ_rcz = (c_z1zK(pars_NG_K, z1, z, size_cen, row) - c_z1zK(pars_GR_K, z1, z, size_cen, row))
+	Δ_sur = one_mat*(s_zK(pars_NG_K, z, size_cen, row) - s_zK(pars_GR_K, z, size_cen, row))
 
     # Function averages
-	grow_avg = (g_z1z(pars_NG_K, z1, z, size_cen, row) + g_z1z(pars_GR_K, z1, z, size_cen, row))/2
+	grow_avg = (g_z1zK(pars_NG_K, z1, z, size_cen, row) + g_z1zK(pars_GR_K, z1, z, size_cen, row))/2
 	#rep_avg = (one_mat*(pb_z(pars_NG_K, z, size_cen, row) + pb_z(pars_GR_K, z, size_cen, row)))/2
-	fec_avg = (one_mat*(pr_z(pars_NG_K, z, size_cen, row) + pr_z(pars_GR_K, z, size_cen, row)))/2
-	rcz_avg = ((c_z1z(pars_NG_K, z1, z, size_cen, row) + c_z1z(pars_GR_K, z1, z, size_cen, row)))/2
-	sur_avg = (one_mat*(s_z(pars_NG_K, z, size_cen, row) + s_z(pars_GR_K, z, size_cen, row)))/2
+	fec_avg = (one_mat*(pr_zK(pars_NG_K, z, size_cen, row) + pr_zK(pars_GR_K, z, size_cen, row)))/2
+	rcz_avg = ((c_z1zK(pars_NG_K, z1, z, size_cen, row) + c_z1zK(pars_GR_K, z1, z, size_cen, row)))/2
+	sur_avg = (one_mat*(s_zK(pars_NG_K, z, size_cen, row) + s_zK(pars_GR_K, z, size_cen, row)))/2
 
     # derivates
     I_mat = diagm(ones(nBigMatrix+1))
@@ -353,12 +352,14 @@ row = 1
 	𝛿_sur  = kron(transpose(I_mat),grow_avg) +  kron(transpose(I_mat),(fec_avg * rcz_avg))
     𝛿_fec  = kron(transpose(sur_avg), rcz_avg)
 	𝛿_rcz  = kron(transpose(fec_avg * sur_avg), I_mat)
-
+?kron
 	𝛿A = kron(I_mat, K_avg) + kron(transpose(K_avg), I_mat)
 
+	λ_grow = Δ_grow .* (vec(sens_avg) * 𝛿A)
+
 	λ_grow = Δ_grow .* reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_grow), (nBigMatrix+1,nBigMatrix+1))
-	λ_fec = Δ_fec .* .* reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_fec), (nBigMatrix+1,nBigMatrix+1))
-	λ_rcz = Δ_rcz .* .* reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_rcz), (nBigMatrix+1,nBigMatrix+1)) 
+	λ_fec = Δ_fec .*  reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_fec), (nBigMatrix+1,nBigMatrix+1))
+	λ_rcz = Δ_rcz .*  reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_rcz), (nBigMatrix+1,nBigMatrix+1)) 
 	λ_sur = Δ_sur .* reshape((([transpose(sens_avg[:]) ; ] * 𝛿A )* 𝛿_sur), (nBigMatrix+1,nBigMatrix+1)) 
 
 
@@ -372,13 +373,6 @@ row = 1
 	sum_con = sur_con + grow_con + fec_con + rcz_con
 	res_IPM.sum_con[row] = sum_con
 
-	p_sur = sur_con / sum_con
-	p_grow = grow_con / sum_con
-#	p_rep = rep_con / sum_con
-	p_fec = fec_con / sum_con
-	p_rcz = rcz_con / sum_con
-
-	p_sur + p_grow  + p_fec + p_rcz
 
 	res_IPM.sur_con[row] = sur_con
 	res_IPM.grow_con[row] = grow_con
@@ -386,11 +380,6 @@ row = 1
 	res_IPM.fec_con[row] = fec_con
 	res_IPM.rcz_con[row] = rcz_con
 
-	res_IPM.p_sur[row] = p_sur
-	res_IPM.p_grow[row] = p_grow
-	#res_IPM.p_rep[row] = p_rep
-	res_IPM.p_fec[row] = p_fec
-	res_IPM.p_rcz[row] = p_rcz
 
 
 	for i in 1:nBigMatrix

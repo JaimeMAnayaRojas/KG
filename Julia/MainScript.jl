@@ -16,10 +16,10 @@ pwd()
 # I am running the models in stan via R, and getting the posteriors for the guppy and killifish IPM
 
 @time begin
-    R"""
-    source("R/MainScript.R")
-    """
-    include("Julia/IPM_G.jl")
-    include("Julia/IPM_K.jl")
-    
+    # R"""
+    # source("R/MainScript.R")
+    # """
+    include("IPM_G.jl")
+    include("IPM_K.jl")
+
 end
