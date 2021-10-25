@@ -262,7 +262,7 @@ end
 mk_K(pars_GR_K, z1, z, size_cen, 1, 0.7)
 
 # Matrices for vital rates
-surv_mat = zeros(size(pars_GR_K)[1], nBigMatrix)+1)
+surv_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 grow_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 rep_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 fec_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
