@@ -100,6 +100,8 @@ data_stan = list(
   stream_growK = Kdata$stream[which(Kdata$surv ==1)],
   area_growK = Kdata$area[which(Kdata$surv ==1)],
   canopy_growK = Kdata$canopy[which(Kdata$surv ==1)],
+  z_gK = log(Kdata$z[which(Kdata$surv ==1)] + 18) - log(18),
+  z1_gK = log(Kdata$z1[which(Kdata$surv ==1)]) - log(18),
   
   
   Repr_K = Kdata$Repr[which(Kdata$surv ==1)],
@@ -116,14 +118,22 @@ data_stan = list(
   NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
   stream_recrK = Kdata$stream[which(Kdata$Repr ==1)],
   area_recrK = Kdata$area[which(Kdata$Repr ==1)],
-  canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)]
+  canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)] 
+
   
   
 )
 # 
-modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4, 
-                iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
-#  
+
+ modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4, 
+                 iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
+
+ 
+ #  
+# modG = stan("R/models/LOG_mod.stan", data = data_stan, cores = 4, chains = 4, 
+#             iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
+
+
 # saveRDS(modG, "Model_priors_Bassar_2017.RDS")
 
 # modG <- readRDS("Model.RDS")
@@ -142,10 +152,6 @@ modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4,
  
 precis(modG, digits = 5, prob = .95, depth = 2)
 
-0.029
-0.016
-0.002
-0.064
 
 
 
@@ -154,6 +160,8 @@ precis(modG, digits = 5, prob = .95, depth = 2)
 #
 
 pos <- extract(modG)
+write.csv(as.data.frame(pos), "Posteriors.csv")
+write.csv(as.data.frame(pos), "PosteriorsLOG_K.csv")
 
 PP = as.vector(apply(as.data.frame(pos), 2, LOS))
 
@@ -170,11 +178,9 @@ model.summary
 model.summary[model.summary$LOS_l > 90,] 
 
 
-# saveRDS(pos, "Posteriors_KG.RDS")
-getwd()
 
-write.csv(as.data.frame(pos), "Posteriors.csv")
-rm(list=ls(all=TRUE))
+
+#rm(list=ls(all=TRUE))
 # 
 # head(as.data.frame(pos))
 # 

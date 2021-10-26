@@ -79,6 +79,17 @@ data{
   
 }
 
+transformed data{
+  
+  real  z2k[N_growK];
+  
+  for(i in 1:N_growK){
+      z2k[i] = (18 + z_growK[i])^2 - (18^2);
+  }
+
+  
+}
+
 parameters{
   
   // surv guppies 
@@ -146,6 +157,7 @@ parameters{
   real Intercept_growK;
   real b_NG_growK;
   real b_z_growK;
+  real b_z2_growK;
   real b_zNG_growK;
   vector[N_stream] v_Intercept_growK;
   //real<lower=0> sigma_stream_growK;
@@ -255,7 +267,7 @@ model{
     
     // Krowth
     
-    sigma_growK ~ cauchy( 5 , 5 );
+    sigma_growK ~ cauchy( 0 , 1 );
     //sigma_stream_growK ~ cauchy( 0 , 2 );
     v_Intercept_growK ~ normal( 0 , sigma_stream_K );
     b_zNG_growK ~ normal( 0 , 1 );
@@ -265,7 +277,7 @@ model{
     
     for ( i in 1:N_growK ) {
       mu_growK[i] = Intercept_growK + b_NG_growK * NG_growK[i] + 
-      b_z_growK * z_growK[i] + b_zNG_growK * NG_growK[i] * z_growK[i] + 
+      b_z_growK * z_growK[i] +  b_z2_growK * z2k[i]+ b_zNG_growK * NG_growK[i] * z_growK[i] + 
       v_Intercept_growK[stream_growK[i]] + 
       b_area_growK * area_growK[i] + b_canopy_growK * canopy_growK[i];
     }
