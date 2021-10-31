@@ -136,10 +136,7 @@ function g_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, siz
   p_den_grow = zeros(size(z)[1],size(z)[1])
   μ = α .+ β * (z .- size_cen )
   for i in 1:nBigMatrix
-    p_df = pdf.(Normal(μ[i], σ), z1).*h
-    for j in 1:nBigMatrix
-      p_den_grow[j,i] = p_df[j]
-    end
+    p_den_grow[,i] = pdf.(Normal(μ[i], σ), z1).*h
   end
   return(p_den_grow)
 end
@@ -432,7 +429,7 @@ CSV.write("G_lamda.est.csv", res_IPM)
 
 ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
 # p_val = (mapcols(x -> boot_p(x), Δ13C_net))
-	summ_tab = DataFrame(parameter = names(res_IPM), mean = round.(mean.(eachcol(res_IPM)), digits=3),
+summ_tab = DataFrame(parameter = names(res_IPM), mean = round.(mean.(eachcol(res_IPM)), digits=3),
                         lc = round.(Vector(ci[1, :]), digits =3), up = round.(Vector(ci[2, :]), digits =3) );
 
 

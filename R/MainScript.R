@@ -129,6 +129,7 @@ data_stan = list(
                  iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
 
  
+ plot(z1 ~ z, Kdata)
  #  
 # modG = stan("R/models/LOG_mod.stan", data = data_stan, cores = 4, chains = 4, 
 #             iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))

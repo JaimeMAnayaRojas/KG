@@ -1,6 +1,8 @@
-setwd("~/Dropbox/Projects_JM/FSU/Pool_manipulation/Pool_R/")
-pos <- readRDS("Posteriors_KG.RDS")
+setwd("~/Dropbox/Projects_JM/FSU/Pool_manipulation/KG_git/")
+pos <- read.csv("Posteriors.csv")
 
+pos[1:5, ]
+getwd()
 library(rethinking)
 ## Get parameters for killifish
 
@@ -44,7 +46,7 @@ m.par.NG_K <- as.data.frame(m.par.NG_K)
 names(m.par.NG_K) <- c("surv.int", "surv.z","grow.int", "grow.z", "grow.sd", 
                        "recr.int", "recr.z")
 
-
+m.par.NG_K[1:5,]
 # IPM For Killifish
 nBigMatrix <- 100
 
@@ -59,13 +61,14 @@ h <- (U - L)/m
 meshpts <- z1 <- z <- L + ((1:m) - 1/2) * h
 size.cen <- (18)
 
+(1:m)
 ### Functions
 ## Growth function
 
 g_z1z <- function(z1, z, m.par){
   
   p.den.grow <- array(NA,c(nBigMatrix ,nBigMatrix))
-  mean <- (as.numeric(m.par[,"grow.int"]) + as.numeric(m.par[,"grow.z"]) * (z -size.cen ))/2  # mean size for two weeks
+  mean <- ((as.numeric(m.par[,"grow.int"]) + as.numeric(m.par[,"grow.z"]) * (z -size.cen )) - z)/2 + z  # mean size for two weeks
   sd <- as.numeric(m.par[,"grow.sd"] )                    # sd about mean
   i=1
   for (i in 1:nBigMatrix){
@@ -79,9 +82,14 @@ g_z1z <- function(z1, z, m.par){
   return((matex))
 }
 
+z
 
-round(colSums(g_z1z(z1 = meshpts, z = meshpts, m.par = m.par.NG_K[1,])),3)
+round(colSums(g_z1z(z1 = meshpts, z = meshpts, m.par = m.par.NG_K[1,])),6)
+m.par = m.par.GR_K[1,]
 
+round(m.par$grow.int, 10)
+za = 18
+((as.numeric(m.par[,"grow.int"]) + as.numeric(m.par[,"grow.z"]) * (za -size.cen )) - za) + za
 
 
 ## Survival function, logistic regression
@@ -100,6 +108,7 @@ s_z <- function(z, m.par){
 
 
 s_z(z = meshpts, m.par = m.par.GR_K[1,])[1:5,1:5]
+
 
 
 plot(colSums(s_z(z = meshpts, m.par = m.par.GR_K[1,])[-1,-1])~ meshpts, type="l", ylim=c(0,1))
