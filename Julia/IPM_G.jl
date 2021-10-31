@@ -136,7 +136,7 @@ function g_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, siz
   p_den_grow = zeros(size(z)[1],size(z)[1])
   μ = α .+ β * (z .- size_cen )
   for i in 1:nBigMatrix
-    p_den_grow[,i] = pdf.(Normal(μ[i], σ), z1).*h
+    p_den_grow[:,i] = pdf.(Normal(μ[i], σ), z1).*h
   end
   return(p_den_grow)
 end
@@ -265,17 +265,17 @@ function get_eigen_stuff(A::AbstractVecOrMat)
 end
 
 
-surv_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
-grow_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
-rep_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
-fec_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
-rcz_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+Gsurv_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+Ggrow_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+#Grep_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+Gfec_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+Grcz_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
 
 ## make DataFrame to store the results
 
 
-res_IPM = DataFrame(zeros(size(pars_GR_G)[1], 15), :auto)
-res_IPM = select(res_IPM, :x1 => "lam_GR", :x2 => "lam_NR", :x3 => "delta_lam",
+Gres_IPM = DataFrame(zeros(size(pars_GR_G)[1], 15), :auto)
+Gres_IPM = select(Gres_IPM, :x1 => "lam_GR", :x2 => "lam_NR", :x3 => "delta_lam",
 					:x4 => "sum_lam_eff", :x5 => "grow_con", :x6 => "fec_con", 
 					:x7 => "rcz_con", :x8 => "sur_con",
 					:x9 => "sum_con", :x10 => "p_grow", :x11 => "p_fec", 
@@ -293,8 +293,8 @@ row = 1
 
 	λ_GR = real(vv_GR.values[end])
 	λ_NR = real(vv_NR.values[end])
-	res_IPM.lam_GR[row] = λ_GR
- 	res_IPM.lam_NR[row] = λ_NR
+	Gres_IPM.lam_GR[row] = λ_GR
+ 	Gres_IPM.lam_NR[row] = λ_NR
 
     ## calculate average matrix
 	K_avg = (IPM_NR["K"] + IPM_GR["K"])./2
@@ -323,8 +323,8 @@ row = 1
 	Δλ = sum(λ_eff)
 	
 
-	res_IPM.sum_lam_eff[row] = Δλ
-	res_IPM.delta_lam[row] = λ_NR - λ_GR
+	Gres_IPM.sum_lam_eff[row] = Δλ
+	Gres_IPM.delta_lam[row] = λ_NR - λ_GR
 
     ## Make life-response table
 
@@ -377,7 +377,7 @@ row = 1
 	fec_con = sum(λ_fec)
 	rcz_con = sum(λ_rcz)
 	sum_con = sur_con + grow_con + fec_con + rcz_con
-	res_IPM.sum_con[row] = sum_con
+	Gres_IPM.sum_con[row] = sum_con
 
 	p_sur = sur_con / sum_con
 	p_grow = grow_con / sum_con
@@ -387,51 +387,51 @@ row = 1
 
 	p_sur + p_grow  + p_fec + p_rcz
 
-	res_IPM.sur_con[row] = sur_con
-	res_IPM.grow_con[row] = grow_con
-	#res_IPM.rep_con[row] = rep_con
-	res_IPM.fec_con[row] = fec_con
-	res_IPM.rcz_con[row] = rcz_con
+	Gres_IPM.sur_con[row] = sur_con
+	Gres_IPM.grow_con[row] = grow_con
+	#Gres_IPM.rep_con[row] = rep_con
+	Gres_IPM.fec_con[row] = fec_con
+	Gres_IPM.rcz_con[row] = rcz_con
 
-	res_IPM.p_sur[row] = p_sur
-	res_IPM.p_grow[row] = p_grow
-	#res_IPM.p_rep[row] = p_rep
-	res_IPM.p_fec[row] = p_fec
-	res_IPM.p_rcz[row] = p_rcz
+	Gres_IPM.p_sur[row] = p_sur
+	Gres_IPM.p_grow[row] = p_grow
+	#Gres_IPM.p_rep[row] = p_rep
+	Gres_IPM.p_fec[row] = p_fec
+	Gres_IPM.p_rcz[row] = p_rcz
 
 
-	for i in 1:nBigMatrix
-		surv_mat[row, i ] =  sum.(eachcol(λ_sur))[i] 
-		grow_mat[row, i ] =  sum.(eachcol(λ_grow))[i] 
-		#rep_mat[row, i ] =  sum.(eachcol(λ_rep))[i] 
-		fec_mat[row, i ] =  sum.(eachcol(λ_fec))[i] 
-		rcz_mat[row, i ] =  sum.(eachcol(λ_rcz))[i] 
-	end
+	Gsurv_mat[row, : ] =  sum.(eachcol(λ_sur)) 
+	Ggrow_mat[row, : ] =  sum.(eachcol(λ_grow)) 
+	#rep_mat[row, : ] =  sum.(eachcol(λ_rep)) 
+	Gfec_mat[row, : ] =  sum.(eachcol(λ_fec)) 
+	Grcz_mat[row, : ] =  sum.(eachcol(λ_rcz)) 
 
 end
 
-names(res_IPM)
+names(Gres_IPM)
 
 
-res_IPM.p_sur = res_IPM.sur_con ./ res_IPM.sum_con
-res_IPM.p_grow = res_IPM.grow_con ./ res_IPM.sum_con
-#res_IPM.p_rep = res_IPM.rep_con ./ res_IPM.sum_con
-res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
-res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
+Gres_IPM.p_sur = Gres_IPM.sur_con ./ Gres_IPM.sum_con
+Gres_IPM.p_grow = Gres_IPM.grow_con ./ Gres_IPM.sum_con
+#Gres_IPM.p_rep = Gres_IPM.rep_con ./ Gres_IPM.sum_con
+Gres_IPM.p_fec = Gres_IPM.fec_con ./ Gres_IPM.sum_con
+Gres_IPM.p_rcz = Gres_IPM.rcz_con ./ Gres_IPM.sum_con
 
-CSV.write("G_survMat.csv", DataFrame(surv_mat, :auto))
-CSV.write("G_growMat.csv", DataFrame(grow_mat, :auto))
-CSV.write("G_fecMat.csv", DataFrame(fec_mat, :auto))
-CSV.write("G_rczMat.csv", DataFrame(rcz_mat, :auto))
-CSV.write("G_lamda.est.csv", res_IPM)
+CSV.write("G_survMat.csv", DataFrame(Gsurv_mat, :auto))
+CSV.write("G_growMat.csv", DataFrame(Ggrow_mat, :auto))
+CSV.write("G_fecMat.csv", DataFrame(Gfec_mat, :auto))
+CSV.write("G_rczMat.csv", DataFrame(Grcz_mat, :auto))
+CSV.write("G_lamda.est.csv", Gres_IPM)
 
 
 
-ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
+ci = (mapcols(x -> HDI(x, credible_mass=0.95), Gres_IPM))
 # p_val = (mapcols(x -> boot_p(x), Δ13C_net))
-summ_tab = DataFrame(parameter = names(res_IPM), mean = round.(mean.(eachcol(res_IPM)), digits=3),
+summ_tab = DataFrame(parameter = names(Gres_IPM), mean = round.(mean.(eachcol(Gres_IPM)), digits=3),
                         lc = round.(Vector(ci[1, :]), digits =3), up = round.(Vector(ci[2, :]), digits =3) );
 
 
 						
 summ_tab
+
+CSV.write("G_IPM_sum.csv", summ_tab )

@@ -163,7 +163,6 @@ end
 
 @time g = g_z1zK(pars_GR_K, z1, z, size_cen, row)
 
-println(round.(sum.(eachcol(gr)), digits = 3))
 
 ## Surival function
 row = 1
@@ -254,10 +253,10 @@ Krcz_mat = zeros(size(pars_GR_K)[1], nBigMatrix+1)
 ## make DataFrame to store the results
 
 
-res_IPM = DataFrame(zeros(size(pars_GR_K)[1], 15), :auto)
+Kres_IPM = DataFrame(zeros(size(pars_GR_K)[1], 15), :auto)
 
 
-res_IPM = select(res_IPM, :x1 => "lam_GR", :x2 => "lam_NG", :x3 => "delta_lam",
+Kres_IPM = select(Kres_IPM, :x1 => "lam_GR", :x2 => "lam_NG", :x3 => "delta_lam",
 					:x4 => "sum_lam_eff", :x5 => "grow_con", :x6 => "fec_con", 
 					:x7 => "rcz_con", :x8 => "sur_con",
 					:x9 => "sum_con")
@@ -275,15 +274,13 @@ row = 1
 
 	λ_GR = real(vv_GR.values[end])
 	λ_NG = real(vv_NG.values[end])
-	res_IPM.lam_GR[row] = λ_GR
- 	res_IPM.lam_NG[row] = λ_NG
+	Kres_IPM.lam_GR[row] = λ_GR
+ 	Kres_IPM.lam_NG[row] = λ_NG
     λ_NG -λ_GR
 
     ## calculate average matrix
 	K_avg = (IPM_NG["K"] + IPM_GR["K"])./2
-  K_avg[1:5, 1:5]
-
-
+  
   vv_avg = eigen(K_avg)
 
     # Normalize stable size distribution
@@ -306,12 +303,12 @@ row = 1
 	Δλ = sum(λ_eff)
 	
 
-	res_IPM.sum_lam_eff[row] = Δλ
-	res_IPM.delta_lam[row] = λ_NG - λ_GR
+	Kres_IPM.sum_lam_eff[row] = Δλ
+	Kres_IPM.delta_lam[row] = λ_NG - λ_GR
 
   ## Make life-response table
 
-	one_mat = ones(nBigMatrix+1, nBigMatrix+1)
+	#one_mat = ones(nBigMatrix+1, nBigMatrix+1)
 
     # Function differences
 	Δ_grow = g_z1zK(pars_NG_K, z1, z, size_cen, row) .- g_z1zK(pars_GR_K, z1, z, size_cen, row)
@@ -352,14 +349,14 @@ row = 1
 	fec_con = sum(λ_fec)
 	rcz_con = sum(λ_rcz)
 	sum_con = sur_con + grow_con + fec_con + rcz_con
-	res_IPM.sum_con[row] = sum_con
+	Kres_IPM.sum_con[row] = sum_con
 
 
-	res_IPM.sur_con[row] = sur_con
-	res_IPM.grow_con[row] = grow_con
-	#res_IPM.rep_con[row] = rep_con
-	res_IPM.fec_con[row] = fec_con
-	res_IPM.rcz_con[row] = rcz_con
+	Kres_IPM.sur_con[row] = sur_con
+	Kres_IPM.grow_con[row] = grow_con
+	#Kres_IPM.rep_con[row] = rep_con
+	Kres_IPM.fec_con[row] = fec_con
+	Kres_IPM.rcz_con[row] = rcz_con
 
 
 	Ksurv_mat[row, : ] =  sum.(eachcol(λ_sur)) 
@@ -370,26 +367,28 @@ row = 1
 
 end
 
-names(res_IPM)
+names(Kres_IPM)
 
 
-res_IPM.p_sur = res_IPM.sur_con ./ res_IPM.sum_con
-res_IPM.p_grow = res_IPM.grow_con ./ res_IPM.sum_con
-#res_IPM.p_rep = res_IPM.rep_con ./ res_IPM.sum_con
-res_IPM.p_fec = res_IPM.fec_con ./ res_IPM.sum_con
-res_IPM.p_rcz = res_IPM.rcz_con ./ res_IPM.sum_con
+Kres_IPM.p_sur = Kres_IPM.sur_con ./ Kres_IPM.sum_con
+Kres_IPM.p_grow = Kres_IPM.grow_con ./ Kres_IPM.sum_con
+#Kres_IPM.p_rep = Kres_IPM.rep_con ./ Kres_IPM.sum_con
+Kres_IPM.p_fec = Kres_IPM.fec_con ./ Kres_IPM.sum_con
+Kres_IPM.p_rcz = Kres_IPM.rcz_con ./ Kres_IPM.sum_con
 
-CSV.write("K_lamda.est.csv", res_IPM)
+CSV.write("K_lamda.est.csv", Kres_IPM)
 CSV.write("K_survMat.csv", DataFrame(Ksurv_mat, :auto))
 CSV.write("K_growMat.csv", DataFrame(Kgrow_mat, :auto))
 CSV.write("K_fecMat.csv", DataFrame(Kfec_mat, :auto))
 CSV.write("K_rczMat.csv", DataFrame(Krcz_mat, :auto))
 
-ci = (mapcols(x -> HDI(x, credible_mass=0.95), res_IPM))
+ci = (mapcols(x -> HDI(x, credible_mass=0.95), Kres_IPM))
 # p_val = (mapcols(x -> boot_p(x), Δ13C_net))
-	summ_tab = DataFrame(parameter = names(res_IPM), mean = round.(mean.(eachcol(res_IPM)), digits=3),
+	summ_tab = DataFrame(parameter = names(Kres_IPM), mean = round.(mean.(eachcol(Kres_IPM)), digits=3),
                         lc = round.(Vector(ci[1, :]), digits =3), up = round.(Vector(ci[2, :]), digits =3) );
 
 
 						
 println(summ_tab)
+
+CSV.write("K_IPM_sum.csv", summ_tab )
