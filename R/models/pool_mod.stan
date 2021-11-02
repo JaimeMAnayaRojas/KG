@@ -99,6 +99,9 @@ parameters{
   real b_zNK_survG;
   real b_area_survG;
   real b_canopy_survG;
+  real b_areaNK_survG;
+  real b_canopyNK_survG;
+  
   vector[N_stream] v_Intercept_survG;
   //  real<lower=0> sigma_stream_survG;
   real<lower=0> sigma_stream_G;
@@ -115,6 +118,8 @@ parameters{
   real<lower=0> sigma_growG;
   real b_area_growG;
   real b_canopy_growG;
+  real b_areaNK_growG;
+  real b_canopyNK_growG;
   
   
   
@@ -136,7 +141,8 @@ parameters{
   vector[N_stream] v_Intercept_recrG;
   real b_area_recrG;
   real b_canopy_recrG;
-  
+  real b_areaNK_recrG;
+  real b_canopyNK_recrG;
   
   // Killifish
   
@@ -149,7 +155,8 @@ parameters{
   real<lower=0> sigma_stream_K;
   real b_area_survK;
   real b_canopy_survK;
-  
+  real b_areaNG_survK;
+  real b_canopyNG_survK;
   
   
   // growth 
@@ -164,6 +171,9 @@ parameters{
   real<lower=0> sigma_growK;
   real b_area_growK;
   real b_canopy_growK;
+  real b_areaNG_growK;
+  real b_canopyNG_growK;
+
   
   
 
@@ -175,6 +185,8 @@ parameters{
   //real<lower=0> sigma_stream_recrK;
   real b_area_recrK;
   real b_canopy_recrK;
+  real b_areaNG_recrK;
+  real b_canopyNG_recrK;
   
   
 }
@@ -202,11 +214,13 @@ model{
   b_NK_survG ~ normal( 0 , 1 );
   Intercept_survG ~ normal( 2.6 , 3 ); //  
   // I use priors from Bassar 2017 evolution
+
   
   for ( i in 1:N_survG ) {
     p_survG[i] = Intercept_survG + b_NK_survG * NK_survG[i] + b_z_survG * z_survG[i] + 
     b_zNK_survG* NK_survG[i] * z_survG[i] + v_Intercept_survG[stream_survG[i]] + 
-    b_area_survG * area_survG[i] + b_canopy_survG * canopy_survG[i] ;
+    b_area_survG * area_survG[i] + b_canopy_survG * canopy_survG[i] + 
+    (b_areaNK_survG * area_survG[i] + b_canopyNK_survG * canopy_survG[i]) *  NK_survG[i];
     p_survG[i] = inv_logit(p_survG[i]);
   }
   Surv_G ~ binomial( 1 , p_survG);
@@ -225,7 +239,8 @@ model{
     mu_growG[i] = Intercept_growG + b_NK_growG * NK_growG[i] + 
     b_z_growG * z_growG[i] + b_zNK_growG * NK_growG[i] * z_growG[i] + 
     v_Intercept_growG[stream_growG[i]]+ 
-    b_area_growG * area_growG[i] + b_canopy_growG * canopy_growG[i] ;
+    b_area_growG * area_growG[i] + b_canopy_growG * canopy_growG[i] +
+    (b_areaNK_growG * area_growG[i] + b_canopyNK_growG * canopy_growG[i]) * NK_growG[i];
   }
   z1_G ~ normal( mu_growG , sigma_growG );
   
@@ -241,7 +256,8 @@ model{
       lambda_G[i] = Intercept_recrG + b_NK_recrG * NK_recrG[i] + b_z_recrG * z_recrG[i] + 
       b_zNK_recrG * NK_recrG[i] * z_recrG[i] + 
       v_Intercept_recrG[stream_recrG[i]] + 
-      b_area_recrG * area_recrG[i] + b_canopy_recrG * canopy_recrG[i];
+      b_area_recrG * area_recrG[i] + b_canopy_recrG * canopy_recrG[i] +
+      (b_areaNK_recrG * area_recrG[i] + b_canopyNK_recrG * canopy_recrG[i]) * NK_recrG[i];
     }
     
     Recr_G ~ poisson_log(lambda_G);  
@@ -260,7 +276,9 @@ model{
     for ( i in 1:N_survK ) {
       p_survK[i] = Intercept_survK + b_NG_survK * NG_survK[i] + b_z_survK * z_survK[i] + 
       b_zNG_survK* NG_survK[i] * z_survK[i] + v_Intercept_survK[stream_survK[i]] + 
-      b_area_survK * area_survK[i] + b_canopy_survK * canopy_survK[i];
+      b_area_survK * area_survK[i] + b_canopy_survK * canopy_survK[i] + 
+      (b_areaNG_survK * area_survK[i] + b_canopyNG_survK * canopy_survK[i])* NG_survK[i];
+      
       p_survK[i] = inv_logit(p_survK[i]);
     }
     Surv_K ~ binomial( 1 , p_survK);
@@ -279,7 +297,8 @@ model{
       mu_growK[i] = Intercept_growK + b_NG_growK * NG_growK[i] + 
       b_z_growK * z_growK[i] +  b_z2_growK * z2k[i]+ b_zNG_growK * NG_growK[i] * z_growK[i] + 
       v_Intercept_growK[stream_growK[i]] + 
-      b_area_growK * area_growK[i] + b_canopy_growK * canopy_growK[i];
+      b_area_growK * area_growK[i] + b_canopy_growK * canopy_growK[i] +
+      (b_areaNG_growK * area_growK[i] + b_canopyNG_growK * canopy_growK[i])* NG_growK[i];
     }
     z1_K ~ normal( mu_growK , sigma_growK );
     
@@ -295,7 +314,8 @@ model{
         lambda_K[i] = Intercept_recrK + b_NG_recrK * NG_recrK[i] + b_z_recrK * z_recrK[i] + 
         b_zNG_recrK * NG_recrK[i] * z_recrK[i] + 
         v_Intercept_recrK[stream_recrK[i]] + 
-        b_area_recrK * area_recrK[i] + b_canopy_recrK * canopy_recrK[i];
+        b_area_recrK * area_recrK[i] + b_canopy_recrK * canopy_recrK[i] + 
+        (b_areaNG_recrK * area_recrK[i] + b_canopyNG_recrK * canopy_recrK[i]) * NG_recrK[i];
       }
       
       Recr_K ~ poisson_log(lambda_K);

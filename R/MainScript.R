@@ -14,8 +14,9 @@ Gdata$z <- Gdata$SL1_mm - 18
 Gdata$z1 <- Gdata$SL2_mm 
 Gdata <- Gdata[-which(Gdata$Sex2=="M"),]
 Gdata$Recr[which(Gdata$Repr==0 & Gdata$surv ==1)] = 0
-Gdata$area <- Gdata$area - mean(unique(Gdata$area))
-Gdata$canopy <- Gdata$canopy - mean(unique(Gdata$canopy))
+
+
+
 
 
 Kdata$z <- Kdata$SL1_mm - 18
@@ -24,9 +25,21 @@ Kdata$z1 <- Kdata$SL2_mm
 
 Kdata <- Kdata[-which(Kdata$Sex2=="M"),]
 Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
-Kdata$area <- Kdata$area - mean(unique(Kdata$area))
-Kdata$canopy <- Kdata$canopy - mean(unique(Kdata$canopy))
 
+
+
+meanA = mean(unique(c(Gdata$area, Kdata$are) ))
+sdA = sd(unique(c(Gdata$area, Kdata$area) ))
+
+
+Gdata$area <- (Gdata$area - meanA) / sdA
+Kdata$area <- (Kdata$area - meanA) / sdA
+
+meanC = mean(unique(c(Gdata$canopy, Kdata$canopy) ))
+sdC = sd(unique(c(Gdata$canopy, Kdata$canopy) ))
+
+Gdata$canopy <- (Gdata$canopy - meanC) /  sdC
+Kdata$canopy <- (Kdata$canopy - meanC) /  sdC
 
 
 
@@ -129,17 +142,6 @@ data_stan = list(
                  iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
 
  
- plot(z1 ~ z, Kdata)
- #  
-# modG = stan("R/models/LOG_mod.stan", data = data_stan, cores = 4, chains = 4, 
-#             iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
-
-
-# saveRDS(modG, "Model_priors_Bassar_2017.RDS")
-
-# modG <- readRDS("Model.RDS")
-#modG <- readRDS("Model_priors_Bassar_2017.RDS")
-# 
  
  LOS <- function(x=NULL){
    
@@ -162,7 +164,6 @@ precis(modG, digits = 5, prob = .95, depth = 2)
 
 pos <- extract(modG)
 write.csv(as.data.frame(pos), "Posteriors.csv")
-write.csv(as.data.frame(pos), "PosteriorsLOG_K.csv")
 
 PP = as.vector(apply(as.data.frame(pos), 2, LOS))
 
@@ -179,7 +180,7 @@ model.summary
 model.summary[model.summary$LOS_l > 90,] 
 
 
-
+write.csv(model.summary, "Model_sum.csv")
 
 #rm(list=ls(all=TRUE))
 # 
