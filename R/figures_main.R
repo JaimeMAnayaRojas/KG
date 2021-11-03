@@ -1,3 +1,51 @@
+# Make survival plot
+
+surv_link <- function(post, size, G = 1, NK, NG, center){
+
+  z = size - center
+
+  if(G == 1){
+    p =  inv_logit(with(post, Intercept_survG + b_NK_survG * NK + b_z_survG * z + b_zNK_survG* NK*z))
+  }else{
+    p =  inv_logit(with(post,Intercept_survK + b_NG_survK * NG + b_z_survK * z + b_zNG_survK* NG*z))
+  }
+
+  return(p)
+}
+
+
+
+grow_link <-function(post, size, G = 1, NK, NG, center){
+
+  z = size - center
+
+  if(G == 1){
+    mu = with(post,Intercept_growG + b_NK_growG * NK + b_z_growG * z + b_zNK_growG * NK * z )
+  }else{
+    mu = with(post,Intercept_growK + b_NG_growK * NG + b_z_growK * z + b_zNG_growK * NG * z)
+  }
+
+
+  return(mu-size)
+}
+
+
+
+
+recr_link <-function(post, size, G = 1, NK, NG, center){
+
+  z = size - center
+
+  if(G == 1){
+    lambda = with(post,Intercept_recrG + b_NK_recrG * NK + b_z_recrG * z + b_zNK_recrG * NK * z )
+  }else{
+    lambda = with(post, Intercept_recrK + b_NG_recrK * NG + b_z_recrK * z + b_zNG_recrK * NG * z )
+  }
+  return(exp(lambda))
+}
+
+
+
 jpeg(file = "Guppy_fig.jpeg",width = 7.5, height = 5, units='in', res=800)
 op<-par(mfrow=c(2,3), mar = c(4, 4 , 2, 1), oma = c(0.5, 1, 1, 0.5)) # c(bottom, left, top, right)
  
@@ -6,12 +54,12 @@ x_axis_max = 32
 
 z.c_grid <-  seq(from= x_axis_min, to=x_axis_max, length.out = 200)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
 p.KG= pred.raw
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
 p.NK= pred.raw
 p.NK.mean <- apply(pred.raw, 2, mean)
 p.NK.PI <- apply(pred.raw, 2, HPDI,prob = .95)
@@ -48,16 +96,16 @@ legend(x= 10, y= .3, c('Control (KG)','No killifish (NK)'),lty=c(1,1), pch=c(21,
 
 
 gsize = seq(from= 7, to=14, length.out = 100)
-surv10_NK_G <- sapply(1:length(gsize), function(i) surv_link(post = pos, size = gsize[i], G = 1, NK = 1, NG = 0, center = 10))
-surv10_KG_G <- sapply(1:length(gsize), function(i) surv_link(post = pos, size = gsize[i], G = 1, NK = 0, NG = 0, center = 10))
+surv10_NK_G <- sapply(1:length(gsize), function(i) surv_link(post = post, size = gsize[i], G = 1, NK = 1, NG = 0, center = 10))
+surv10_KG_G <- sapply(1:length(gsize), function(i) surv_link(post = post, size = gsize[i], G = 1, NK = 0, NG = 0, center = 10))
 mean(as.numeric(surv10_NK_G - surv10_KG_G))*100
 HPDI(as.numeric(surv10_NK_G - surv10_KG_G))*100
 100-LOS(as.numeric(surv10_NK_G - surv10_KG_G))
 
 
 gsize = seq(from= 25, to=30, length.out = 100)
-surv25_NK_G <-sapply(1:length(gsize), function(i) surv_link(post = pos, size = gsize[i], G = 1, NK = 1, NG = 0, center = 10))
-surv25_KG_G <-  sapply(1:length(gsize), function(i) surv_link(post = pos, size = gsize[i], G = 1, NK = 0, NG = 0, center = 10))
+surv25_NK_G <-sapply(1:length(gsize), function(i) surv_link(post = post, size = gsize[i], G = 1, NK = 1, NG = 0, center = 10))
+surv25_KG_G <-  sapply(1:length(gsize), function(i) surv_link(post = post, size = gsize[i], G = 1, NK = 0, NG = 0, center = 10))
 mean(as.numeric(surv10_NK_G - surv25_NK_G))*100
 HPDI(as.numeric(surv10_NK_G - surv25_NK_G))*100
 100-LOS(as.numeric(surv10_NK_G - surv25_NK_G))
@@ -65,12 +113,12 @@ HPDI(as.numeric(surv10_NK_G - surv25_NK_G))*100
 # Growth
 
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
 p.KG= pred.raw
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
 p.NK= pred.raw
 p.NK.mean <- apply(pred.raw, 2, mean)
 p.NK.PI <- apply(pred.raw, 2, HPDI,prob = .95)
@@ -110,8 +158,8 @@ title(main='b)', adj = 0, line = 0.5)
 
 
 
-pred.KG <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
-pred.NK <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
+pred.KG <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
+pred.NK <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
 
 
 mean(as.numeric(pred.NK / pred.KG)) * 100 -100
@@ -122,11 +170,11 @@ LOS(as.numeric(pred.NK - pred.KG))
 
 z.c_grid <-  seq(from= x_axis_min, to=x_axis_max, length.out = 200)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
 p.NK.mean <- apply(pred.raw, 2, mean)
 p.NK.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
@@ -156,8 +204,8 @@ title(main='c)', adj = 0, line = 0.5)
 
 #legend('topleft',c('KG','NK'),lty=c(1,1),pch=c(16,16),col=c('black','orange'),bty='n')
 z.c_grid <-  seq(from= 20, to=30, length.out = 50)
-pred.KG <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
-pred.NK <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
+pred.KG <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 1, NK = 0, NG = 0, center = 18))
+pred.NK <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 1, NK = 1, NG = 0, center = 18))
 
 mean(as.numeric(pred.NK / pred.KG))
 HPDI(as.numeric(pred.NK / pred.KG))
@@ -167,17 +215,17 @@ mean(as.numeric(pred.NK / pred.KG)) * 100 -100
 HPDI(as.numeric(pred.NK / pred.KG))  * 100 -100
 LOS(as.numeric(pred.NK - pred.KG))
 
-LOS(pos$b_zNK_recrG)
+LOS(post$b_zNK_recrG)
 
 
 # Killifish
 z.c_grid <-  seq(from= 5, to=100, length.out = 200)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
+pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
+pred.raw <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
 p.NK.mean <- apply(pred.raw, 2, mean)
 p.NK.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
@@ -207,8 +255,8 @@ lines(z.c_grid, (p.NK.mean), col="tomato", lwd=2)
 title(main='d)', adj = 0, line = 0.5)
 legend(x= 40, y = 0.3,c('Control (KG)','No guppy (NG)'),lty=c(1,1),pch=c(21,21), col=c(col.alpha("black", 1),'tomato'), pt.bg = c(col.alpha("gray", 1),'tomato'),bty='n')
 
-pred.KG <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
-pred.NG <- sapply(1:length(z.c_grid), function(i) surv_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
+pred.KG <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
+pred.NG <- sapply(1:length(z.c_grid), function(i) surv_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
 
 
 LOS(pred.NG-pred.KG)
@@ -218,11 +266,11 @@ HPDI(pred.NG/pred.KG, prob=.95)
 
 # Growth
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 18))
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 18))
 p.NG.mean <- apply(pred.raw, 2, mean)
 p.NG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
@@ -252,9 +300,9 @@ title(main='e)', adj = 0, line = 0.5)
 
 
 
-pred.KG <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
+pred.KG <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
 
-pred.NG <- sapply(1:length(z.c_grid), function(i) grow_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
+pred.NG <- sapply(1:length(z.c_grid), function(i) grow_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 1, center = 10))
 mean(pred.NG/pred.KG)
 
 LOS(pred.NG-pred.KG)
@@ -264,11 +312,11 @@ HPDI(pred.NG/pred.KG, prob=.95)
 # Fecundity
 
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 18))
 p.KG.mean <- apply(pred.raw, 2, mean)
 p.KG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
-pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 0, NK =0, NG = 1, center = 18))
+pred.raw <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 0, NK =0, NG = 1, center = 18))
 p.NG.mean <- apply(pred.raw, 2, mean)
 p.NG.PI <- apply(pred.raw, 2, HPDI,prob = .95)
 
@@ -296,15 +344,15 @@ title(main='f)', adj = 0, line = 0.5)
 
 
 z.c_grid <-  seq(from= 20, to=100, length.out = 200)
-pred.KG <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
-pred.NG <- sapply(1:length(z.c_grid), function(i) recr_link(post = pos, size = z.c_grid[i], G = 0, NK =0, NG = 1, center = 10))
+pred.KG <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 0, NK = 0, NG = 0, center = 10))
+pred.NG <- sapply(1:length(z.c_grid), function(i) recr_link(post = post, size = z.c_grid[i], G = 0, NK =0, NG = 1, center = 10))
 
 
 mean(as.numeric(pred.NG / pred.KG))
 HPDI(as.numeric(pred.NG / pred.KG))
 LOS(as.numeric(pred.NG - pred.KG))
 
-LOS(pos$b_zNK_recrG)
+LOS(post$b_zNK_recrG)
 graphics.off()
 
 

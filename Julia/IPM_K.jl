@@ -1,6 +1,6 @@
 # these dataframes are from previous analyses in stan
 function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110, 
-  size_cen = 18.0, area = 0.0, canopy =0.0)
+  size_cen = 18.0)
 	
   # nBigMatrix = 100
   # min_size = 2.0
@@ -29,7 +29,6 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
       :Intercept_growK => :"α_grow",
       :b_z_growK => :"βz_grow",
-      :b_z2_growK => :"βz2_grow",
       :b_area_growK => :"β_area_grow",
       :b_canopy_growK => :"β_canopy_grow",
       :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
@@ -52,7 +51,7 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
       :Intercept_growK => :"α_grow",
       :b_z_growK => :"βz_grow",
-      :b_z2_growK => :"βz2_grow",
+     
       :b_area_growK => :"β_area_grow",
       :b_canopy_growK => :"β_canopy_grow",
       :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
@@ -74,14 +73,13 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
 
 
-  function g_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+  function g_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
     α= df.α_grow[row]
     β= df.βz_grow[row]
-    βa= df.β_area_grow[row]
-    βc= df.β_canopy_grow[row]
+   
     σ= df.σ_grow[row]
     p_den_grow = zeros(size(z)[1],size(z)[1])
-    μ = ((α .+ β .* (z .- size_cen ) .+ βa .* area .+ βc .* canopy .- (z))./2 .+ z) # average growth in two weeks
+    μ = ((α .+ β .* (z .- size_cen ) .- (z))./2 .+ z) # average growth in two weeks
     #μ = round.(μ, digits = 10)
     
     for i in 1:nBigMatrix
@@ -102,12 +100,11 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
 
   function s_zK(df::AbstractDataFrame, z::AbstractVector, 
-    size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+    size_cen::AbstractFloat, row::Integer)
     α= df.α_surv[row]
     β= df.βz_surv[row]
-    βa= df.β_area_surv[row]
-    βc= df.β_canopy_surv[row]
-    linear_p = α .+ β * (z .- size_cen) .+ βa .* area .+ βc .* canopy      # linear predictor
+   
+    linear_p = α .+ β * (z .- size_cen)      # linear predictor
     p = 1 ./(1 .+ exp.(-linear_p))
     p = diagm(sqrt.(p))
     matex = zeros(nBigMatrix+1, nBigMatrix+1)
@@ -130,13 +127,10 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
 
   ## Recruitment function (N.B - from birth in spring to first summer), logistic regression
-  function pr_zK(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+  function pr_zK(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
     α= df.α_fec[row]
     β= df.βz_fec[row]
-    βa= df.β_area_fec[row]
-    βc= df.β_canopy_fec[row]
-
-    linear_p = α .+ β * (z .- size_cen)  .+ βa .* area .+ βc .* canopy     # linear predictor  # linear predictor
+    linear_p = α .+ β * (z .- size_cen)   # linear predictor  # linear predictor
     p = exp.(linear_p).*(1/2)
     #p = diagm(p)
     matex = zeros(nBigMatrix+1, nBigMatrix+1)
@@ -147,7 +141,7 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
   ## Recruit size function
   function c_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-    size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+    size_cen::AbstractFloat, row::Integer)
     #α= df.rcz_int[row]
     #β= df.rcz_z[row]
     #βa= df.β_area_rcz[row]
@@ -173,10 +167,10 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
 
   function mk_KK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, 
-    row::Integer, V::AbstractFloat, area::Float64, canopy::Float64)
-      F = pr_zK(df, z, size_cen, row, area, canopy) * s_zK(df, z, size_cen, row, area, canopy)
-      P = g_z1zK(df, z, z, size_cen, row, area, canopy) * s_zK(df, z, size_cen, row, area, canopy)
-      A = (P + F) + (V .* c_z1zK(df, z1, z, size_cen, row, area, canopy))
+    row::Integer, V::AbstractFloat)
+      F = pr_zK(df, z, size_cen, row) * s_zK(df, z, size_cen, row)
+      P = g_z1zK(df, z, z, size_cen, row) * s_zK(df, z, size_cen, row)
+      A = (P + F) + (V .* c_z1zK(df, z1, z, size_cen, row))
       K = A * A
       out = Dict("K"=> K, "meshpts" => z, "P" => P, "F"=> F, "A" => A)
       return(out)
@@ -204,8 +198,8 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
 
   for row in 1:size(pars_GR_K)[1]
       # Make projection kernels
-    IPM_GR = mk_KK(pars_GR_K, z1, z, size_cen, row, 0.7, area, canopy)
-    IPM_NG = mk_KK(pars_NG_K, z1, z, size_cen, row, 0.7, area, canopy)
+    IPM_GR = mk_KK(pars_GR_K, z1, z, size_cen, row, 0.7)
+    IPM_NG = mk_KK(pars_NG_K, z1, z, size_cen, row, 0.7)
       # calculate the population growth rate (λ)
 
     vv_GR = eigen(IPM_GR["K"])
@@ -250,18 +244,18 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     #one_mat = ones(nBigMatrix+1, nBigMatrix+1)
 
       # Function differences
-    Δ_grow = g_z1zK(pars_NG_K, z1, z, size_cen, row, area, canopy) .- g_z1zK(pars_GR_K, z1, z, size_cen, row, area, canopy)
+    Δ_grow = g_z1zK(pars_NG_K, z1, z, size_cen, row) .- g_z1zK(pars_GR_K, z1, z, size_cen, row)
     #Δ_rep = one_mat*(pb_z(pars_NG_K, z, size_cen, row) - pb_z(pars_GR_K, z, size_cen, row))
-    Δ_fec = (pr_zK(pars_NG_K, z, size_cen, row, area, canopy) .- pr_zK(pars_GR_K, z, size_cen, row, area, canopy))
-    Δ_rcz = (c_z1zK(pars_NG_K, z1, z, size_cen, row, area, canopy) .- c_z1zK(pars_GR_K, z1, z, size_cen, row, area, canopy))
-    Δ_sur = (s_zK(pars_NG_K, z, size_cen, row, area, canopy) .- s_zK(pars_GR_K, z, size_cen, row, area, canopy))
+    Δ_fec = (pr_zK(pars_NG_K, z, size_cen, row) .- pr_zK(pars_GR_K, z, size_cen, row))
+    Δ_rcz = (c_z1zK(pars_NG_K, z1, z, size_cen, row) .- c_z1zK(pars_GR_K, z1, z, size_cen, row))
+    Δ_sur = (s_zK(pars_NG_K, z, size_cen, row) .- s_zK(pars_GR_K, z, size_cen, row))
 
       # Function averages
-    grow_avg = (g_z1zK(pars_NG_K, z1, z, size_cen, row, area, canopy) + g_z1zK(pars_GR_K, z1, z, size_cen, row, area, canopy))/2
+    grow_avg = (g_z1zK(pars_NG_K, z1, z, size_cen, row) + g_z1zK(pars_GR_K, z1, z, size_cen, row))/2
     #rep_avg = (one_mat*(pb_z(pars_NG_K, z, size_cen, row) + pb_z(pars_GR_K, z, size_cen, row)))/2
-    fec_avg = ((pr_zK(pars_NG_K, z, size_cen, row, area, canopy) + pr_zK(pars_GR_K, z, size_cen, row, area, canopy)))/2
-    rcz_avg = ((c_z1zK(pars_NG_K, z1, z, size_cen, row, area, canopy) + c_z1zK(pars_GR_K, z1, z, size_cen, row, area, canopy)))/2
-    sur_avg = ((s_zK(pars_NG_K, z, size_cen, row, area, canopy) + s_zK(pars_GR_K, z, size_cen, row, area, canopy)))/2
+    fec_avg = ((pr_zK(pars_NG_K, z, size_cen, row) + pr_zK(pars_GR_K, z, size_cen, row)))/2
+    rcz_avg = ((c_z1zK(pars_NG_K, z1, z, size_cen, row) + c_z1zK(pars_GR_K, z1, z, size_cen, row)))/2
+    sur_avg = ((s_zK(pars_NG_K, z, size_cen, row) + s_zK(pars_GR_K, z, size_cen, row)))/2
 
       # derivates
     I_mat = diagm(ones(nBigMatrix+1))

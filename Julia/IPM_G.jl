@@ -20,7 +20,7 @@ end
 
 
 
-function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0, area = 0.0, canopy =0.0)
+function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0)
 	
 	# nBigMatrix = 100
 	# min_size = 4
@@ -82,34 +82,27 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 	pars_NR_G.α_surv = pars_NR_G.α_surv .+ post.b_NK_survG
 	pars_NR_G.βz_surv = pars_NR_G.βz_surv .+ post.b_zNK_survG 
-	pars_NR_G.β_area_surv = pars_NR_G.β_area_surv .+ post.b_areaNK_survG
-	pars_NR_G.β_canopy_surv = pars_NR_G.β_canopy_surv .+ post.b_canopyNK_survG
 
 
 	pars_NR_G.α_grow = pars_NR_G.α_grow .+ post.b_NK_growG
 	pars_NR_G.βz_grow = pars_NR_G.βz_grow .+ post.b_zNK_growG 
-	pars_NR_G.β_area_grow = pars_NR_G.β_area_grow .+ post.b_areaNK_growG 
-	pars_NR_G.β_canopy_grow = pars_NR_G.β_canopy_grow .+ post.b_canopyNK_growG 
 
 
 	pars_NR_G.α_fec = pars_NR_G.α_fec .+ post.b_NK_recrG
 	pars_NR_G.βz_fec = pars_NR_G.βz_fec .+ post.b_zNK_recrG 
-	pars_NR_G.β_area_fec = pars_NR_G.β_area_fec .+ post.b_areaNK_recrG 
-	pars_NR_G.β_canopy_surv = pars_NR_G.β_canopy_fec .+ post.b_canopyNK_recrG 
 
 
 	df = nothing
 	function g_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+		size_cen::AbstractFloat, row::Integer)
 		α= df.α_grow[row]
 		β= df.βz_grow[row]
-		βa= df.β_area_grow[row]
-		βc= df.β_canopy_grow[row]
+		
 		σ= df.σ_grow[row]
 
 
 		p_den_grow = zeros(size(z)[1],size(z)[1])
-		μ = α .+ β * (z .- size_cen ) .+ βa .* area .+ βc .* canopy
+		μ = α .+ β * (z .- size_cen ) 
 		for i in 1:nBigMatrix
 			p_den_grow[:,i] = pdf.(Normal(μ[i], σ), z1).*h
 		end
@@ -126,12 +119,11 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	## Surival function
 	#row = 1
 	function s_z(df::AbstractDataFrame, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+		size_cen::AbstractFloat, row::Integer)
 		α= df.α_surv[row]
 		β= df.βz_surv[row]
-		βa= df.β_area_surv[row]
-		βc= df.β_canopy_surv[row]
-		linear_p = α .+ β * (z .- size_cen) .+ βa .* area .+ βc .* canopy    # linear predictor
+		
+		linear_p = α .+ β * (z .- size_cen)  # linear predictor
 		p = 1 ./(1 .+ exp.(-linear_p))
 		p = diagm(p)
 		return(p)
@@ -152,13 +144,12 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 
 	## Recruitment function (N.B - from birth in spring to first summer), logistic regression
-	function pr_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+	function pr_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
 		α= df.α_fec[row]
 		β= df.βz_fec[row]
-		βa= df.β_area_fec[row]
-		βc= df.β_canopy_fec[row]
+		
 
-		linear_p = α .+ β * (z .- size_cen)  .+ βa .* area .+ βc .* canopy     # linear predictor
+		linear_p = α .+ β * (z .- size_cen)     # linear predictor
 		p = exp.(linear_p)*(1/2)
 		p = diagm(p)
 		return(p)
@@ -167,7 +158,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 	## Recruit size function
 	function c_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+		size_cen::AbstractFloat, row::Integer)
 		#α= df.rcz_int[row]
 		#β= df.rcz_z[row]
 		σ= 0.4 #pars.rcz_sd[row]
@@ -190,17 +181,17 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	## Functions to build IPM kernels P, F, and K
 
 	function P_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
+		size_cen::AbstractFloat, row::Integer)
 
-		out = g_z1z(df, z1, z, size_cen, row, area, canopy) * s_z(df, z, size_cen, row, area, canopy)
+		out = g_z1z(df, z1, z, size_cen, row) * s_z(df, z, size_cen, row)
 		return(out)
 
 	end
 
 	function F_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
-		out1 = c_z1z(df, z1, z, size_cen, row, area, canopy)
-		out2 = pr_z(df, z, size_cen, row, area, canopy) * s_z(df, z, size_cen, row, area, canopy)
+		size_cen::AbstractFloat, row::Integer)
+		out1 = c_z1z(df, z1, z, size_cen, row)
+		out2 = pr_z(df, z, size_cen, row) * s_z(df, z, size_cen, row)
 		out = out1 * out2
 		return(out)
 	
@@ -208,9 +199,9 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 
 	function mk_K(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
-		size_cen::AbstractFloat, row::Integer, area::Float64, canopy::Float64)
-		F = F_z1z(df, z1, z, size_cen, row, area, canopy)
-		P = P_z1z(df, z1, z, size_cen, row, area, canopy)
+		size_cen::AbstractFloat, row::Integer)
+		F = F_z1z(df, z1, z, size_cen, row)
+		P = P_z1z(df, z1, z, size_cen, row)
 		K = P + F
 		out = Dict("K"=> K, "meshpts" => z, "P" => P, "F"=> F)
 		return(out)
@@ -238,8 +229,8 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
     
 	for row in 1:size(post)[1]
 		# Make projection kernels
-		IPM_GR = mk_K(pars_GR_G, z1, z, size_cen, row, area, canopy)
-		IPM_NR = mk_K(pars_NR_G, z1, z, size_cen, row, area, canopy)
+		IPM_GR = mk_K(pars_GR_G, z1, z, size_cen, row)
+		IPM_NR = mk_K(pars_NR_G, z1, z, size_cen, row)
 		# calculate the population growth rate (λ)
 
 		vv_GR = eigen(IPM_GR["K"])
@@ -285,18 +276,18 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		one_mat = ones(nBigMatrix, nBigMatrix)
 
 		# Function differences
-		Δ_grow = g_z1z(pars_NR_G, z1, z, size_cen, row, area, canopy) - g_z1z(pars_GR_G, z1, z, size_cen, row, area, canopy)
+		Δ_grow = g_z1z(pars_NR_G, z1, z, size_cen, row) - g_z1z(pars_GR_G, z1, z, size_cen, row)
 		#Δ_rep = one_mat*(pb_z(pars_NR_G, z, size_cen, row) - pb_z(pars_GR_G, z, size_cen, row))
-		Δ_fec = one_mat*(pr_z(pars_NR_G, z, size_cen, row, area, canopy) - pr_z(pars_GR_G, z, size_cen, row, area, canopy))
-		Δ_rcz = (c_z1z(pars_NR_G, z1, z, size_cen, row, area, canopy) - c_z1z(pars_GR_G, z1, z, size_cen, row, area, canopy))
-		Δ_sur = one_mat*(s_z(pars_NR_G, z, size_cen, row, area, canopy) - s_z(pars_GR_G, z, size_cen, row, area, canopy))
+		Δ_fec = one_mat*(pr_z(pars_NR_G, z, size_cen, row) - pr_z(pars_GR_G, z, size_cen, row))
+		Δ_rcz = (c_z1z(pars_NR_G, z1, z, size_cen, row) - c_z1z(pars_GR_G, z1, z, size_cen, row))
+		Δ_sur = one_mat*(s_z(pars_NR_G, z, size_cen, row) - s_z(pars_GR_G, z, size_cen, row))
 
 		# Function averages
-		grow_avg = (g_z1z(pars_NR_G, z1, z, size_cen, row, area, canopy) + g_z1z(pars_GR_G, z1, z, size_cen, row, area, canopy))/2
+		grow_avg = (g_z1z(pars_NR_G, z1, z, size_cen, row) + g_z1z(pars_GR_G, z1, z, size_cen, row))/2
 		#rep_avg = (one_mat*(pb_z(pars_NR_G, z, size_cen, row) + pb_z(pars_GR_G, z, size_cen, row)))/2
-		fec_avg = (one_mat*(pr_z(pars_NR_G, z, size_cen, row, area, canopy) + pr_z(pars_GR_G, z, size_cen, row, area, canopy)))/2
-		rcz_avg = ((c_z1z(pars_NR_G, z1, z, size_cen, row, area, canopy) + c_z1z(pars_GR_G, z1, z, size_cen, row, area, canopy)))/2
-		sur_avg = (one_mat*(s_z(pars_NR_G, z, size_cen, row, area, canopy) + s_z(pars_GR_G, z, size_cen, row, area, canopy)))/2
+		fec_avg = (one_mat*(pr_z(pars_NR_G, z, size_cen, row) + pr_z(pars_GR_G, z, size_cen, row)))/2
+		rcz_avg = ((c_z1z(pars_NR_G, z1, z, size_cen, row) + c_z1z(pars_GR_G, z1, z, size_cen, row)))/2
+		sur_avg = (one_mat*(s_z(pars_NR_G, z, size_cen, row) + s_z(pars_GR_G, z, size_cen, row)))/2
 
 		# derivates
 
