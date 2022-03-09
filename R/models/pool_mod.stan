@@ -93,9 +93,11 @@ transformed data{
 parameters{
   
   // surv guppies 
-  real<lower=1.33, upper=4.86>  Intercept_survG;
+  real Intercept_survG;
+ // real<lower=1.33, upper=4.86>  Intercept_survG;
   real b_NK_survG;
-  real<lower=0.04, upper=0.28> b_z_survG;
+//  real<lower=0.04, upper=0.28> b_z_survG;
+  real b_z_survG;
   real b_zNK_survG;
   real b_area_survG;
   real b_canopy_survG;

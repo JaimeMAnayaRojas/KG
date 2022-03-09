@@ -1,4 +1,5 @@
 using Distributions
+
 using CSV
 using DataFrames
 using LinearAlgebra
@@ -6,113 +7,159 @@ using StatsPlots
 using JLD2
 using RCall
 
+function HDI(samples; credible_mass=0.95)
+	# Computes highest density interval from a sample of representative values,
+	# estimated as the shortest credible interval
+	# Takes Arguments posterior_samples (samples from posterior) and credible mass (normally .95)
+	# Originally from https://stackoverflow.com/questions/22284502/highest-posterior-density-region-and-central-credible-region
+	# Adapted to Julialang
+	sorted_points = sort(samples)
+	ciIdxInc = Int(ceil(credible_mass * length(sorted_points)))
+	nCIs = length(sorted_points) - ciIdxInc
+	ciWidth = repeat([0.0],nCIs)
+	for i in range(1, stop=nCIs)
+		ciWidth[i] = sorted_points[i + ciIdxInc] - sorted_points[i]
+	end
+	HDImin = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)]
+	HDImax = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)+ciIdxInc]
+	return([HDImin, HDImax])
+end
+
+
+function LOS(v, b = 0)
+	return 100*length(findall(v .> b)) ./length(v)
+end
+
+
 cd("$(homedir())")
 cd("Dropbox/Projects_JM/FSU/Pool_manipulation/KG_git/")
 pwd()
 
 
-# R"""
-#     source("R/MainScript.R")
-# """
-#@rget post
+R"""
+    source("R/MainScript.R")
+"""
+@rget post
 post = CSV.read("Posteriors.csv", DataFrame)# Statistical analyses
 # I am running the models in stan via R, and getting the posteriors for the guppy and killifish IPM# 
 
 
 
-include("Julia/IPM_G.jl") # run from IED
-## include("IPM_G.jl") # run from terminal
-#Guppy_IPM(DataFrame(post[1:5,:]); nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0)
+include("IPM_G.jl") # run from IED
+include("IPM_K.jl")
+ 
 
+# Run both IPM models
 
+IPMs = [Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0),
+Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)]
 
-
-include("Julia/IPM_K.jl")
-## include("IPM_K.jl")
-# Killifish_IPM(DataFrame(post[1,:]); nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)
-
-
-# IPMs = [Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0),
-# Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)]
-
-
-
+## Save the IPMs
 @save "IPMs.jld2" IPMs  
-@load "IPMs.jld2" IPMs  
+# @load "IPMs.jld2" IPMs  
 
 
+# ##### Figures vital rates
 
-# size(G_sim)[1]
+# f1 = include("Man_plots.jl")
 
-# G_sim[1][1]
+# savefig(f1, "Figure 1.png")
 
-#summ_tab = DataFrame()
-df = IPMs[1][1]
-ci = (mapcols(x -> HDI(x, credible_mass=0.95), df))
-# p_val = (mapcols(x -> boot_p(x), Δ13C_net))
-G = DataFrame(parameter = names(df), mean = round.(mean.(eachcol(df)), digits=3),
-lc = round.(Vector(ci[1, :]), digits =3), up = round.(Vector(ci[2, :]), digits =3) );
+# sTab[1][:,:Species] = fill("Guppy", size(sTab[1])[1])
+# sTab[2][:,:Species] = fill("Kilifish", size(sTab[2])[1])
 
-#append!(summ_tab, summ_tab1)
+# sumTab = sTab[1]
 
-df = IPMs[2][1]
-ci = (mapcols(x -> HDI(x, credible_mass=0.95), df))
-# p_val = (mapcols(x -> boot_p(x), Δ13C_net))
-K = DataFrame(parameter = names(df), mean = round.(mean.(eachcol(df)), digits=3),
-lc = round.(Vector(ci[1, :]), digits =3), up = round.(Vector(ci[2, :]), digits =3) );
+# append!(sumTab, sTab[2])
+
+# println(sumTab)
+# CSV.write("Summary_statsIPM.csv", sumTab )
 
 
-sTab = [G, K]
+# ### Plot 2 or supplementary
+# ### Posterior probability changes LTRE
+# # Guppy
+# nBigMatrix = 100
+# min_size = 4
+# max_size = 35
+# size_cen = 18.0
 
-sTab[1]
-sTab[2]
-
-
-## Make plots
-a = 1:4
-med_b = sTab[1][1:2,:mean]
-med_b = append!(sTab[2][1:2,:mean], med_b)
-max_b = sTab[1][1:2,:up]
-max_b =append!(sTab[2][1:2,:up], max_b)
-min_b = sTab[1][1:2,:lc]
-min_b =append!(sTab[2][1:2,:lc], min_b)
-
-x = [0, 4.5 ]
-y = [1,1]
-plot(x,y, xlims = (0.5, 4.5), c = :black, line = (:dash, 1))
-x = [1, 2 , NaN, 3, 4]
-y = [med_b[1], med_b[2],  NaN, med_b[3], med_b[4]]
-plot!(x,y, c = :black)
-scatter!((a, med_b),	yerror=(med_b-min_b, max_b-med_b), markersize = 10, 
-    xlims = (0.5, 4.5), legend = false, colour = [:cyan3, :cyan3, :coral2, :coral2] )
-ylabel!("Fitness (λ)")
-xlabel!("Pool treatment")
-xticks!([1,2,3,4], ["KG", "NK", "KG", "NG"])
-savefig("Figure 1_julia.png")
-
-#
-
-# LTRE
-
-## Make plots
+# U= Float64(max_size)
+# L=Float64(min_size)
+# m = nBigMatrix
+# h = (U - L)/m
+# z1 =  L .+ (collect(1:m) .- 0.5) * h
+# vm = DataFrame(IPMs[1][2], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
 
 
-a = 1:5
-med_b = sTab[1][[9,8,5,6,7],:mean]
-max_b = sTab[1][[9,8,5,6,7],:up]
-min_b = sTab[1][[9,8,5,6,7],:lc]
+# minimum(size_loss)
+# z1[findall(size_loss .< 17)]
 
-bar((a, med_b),	yerror=(med_b-min_b, max_b-med_b), markersize = 10, 
-    xlims = (0.5, 4.5), lab ="Guppy"  )
+# histogram(size_loss, bin = 20)
 
-med_b = sTab[2][[9,8,5,6,7],:mean]
-max_b = sTab[2][[9,8,5,6,7],:up]
-min_b = sTab[2][[9,8,5,6,7],:lc]
+# pF2G = plot(z1, size_loss, label = "S(z)", legend =:bottomright, title = "a)", titleloc = :left)
 
-bar((a, med_b),	yerror=(med_b-min_b, max_b-med_b), markersize = 10, xlims = (0.5, 4.5), lab ="killifish"  )
+# vm = DataFrame(IPMs[1][3], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
+# plot!(z1, size_loss, label = "G(z,z')")
 
 
-ylabel!("Fitness (λ)")
-xlabel!("Pool treatment")
-xticks!([1,2,3,4], ["KG", "NK", "KG", "NG"])
-savefig("Figure 1_julia.png")
+# vm = DataFrame(IPMs[1][4], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
+# plot!(z1, size_loss, label = "R(z)")
+
+# ylabel!("Posterior probability (%) \n (ΔV= NK-KG> 0)")
+# xlabel!("Guppy size")
+
+# hspan!([95, 100],  color = :deepskyblue, alpha = 0.2, labels = false)
+# hspan!([0, 5],  color = :deepskyblue, alpha = 0.2, labels = false)
+# plot!([min_size, max_size], [50,50], c = :gray, linestyle = :dash, lab = false, linewidth = 1.5)
+
+# # Killifish
+
+# # size-speficif LTRE
+# nBigMatrix = 100
+# min_size = 2
+# max_size = 110
+# size_cen = 18.0
+
+# U= Float64(max_size)
+# L=Float64(min_size)
+# m = nBigMatrix
+# h = (U - L)/m
+# z1 =  L .+ (collect(1:m) .- 0.5) * h
+# z = 0
+# z1 = vcat(z,z1)
+# vm = DataFrame(IPMs[2][2], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
+# pF2K = plot(z1, size_loss, label = false, title = "b)", titleloc = :left)
+
+# vm = DataFrame(IPMs[2][3], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
+# plot!(z1, size_loss, label =  false)
+
+
+# vm = DataFrame(IPMs[2][4], :auto);
+# size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
+# plot!(z1, size_loss, label = false)
+
+# ylabel!("Posterior probability (%) \n (ΔV= NK-KG> 0)")
+# xlabel!("Killifish size")
+
+# hspan!([95, 100],  color = :deepskyblue, alpha = 0.2, labels = false)
+# hspan!([0, 5],  color = :deepskyblue, alpha = 0.2, labels = false)
+# plot!([min_size, max_size], [50,50], c = :gray, linestyle = :dash, lab = false, linewidth = 1.5)
+
+# # l = @layout [
+# #     a 
+# # 	[grid(2,2)]
+# # ]
+
+# using Plots.Measures
+# plot(pF2G, pF2K,
+#     layout = (2,1), size = (400, 600), titlefont = 11, foreground_color_legend = nothing, 
+#     margin = [2mm 3mm], xlims =(5,100)
+# )
+
+# savefig("Figure 2.png")

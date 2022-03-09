@@ -1,21 +1,4 @@
-function HDI(samples; credible_mass=0.95)
-	# Computes highest density interval from a sample of representative values,
-	# estimated as the shortest credible interval
-	# Takes Arguments posterior_samples (samples from posterior) and credible mass (normally .95)
-	# Originally from https://stackoverflow.com/questions/22284502/highest-posterior-density-region-and-central-credible-region
-	# Adapted to Julialang
-	sorted_points = sort(samples)
-	ciIdxInc = Int(ceil(credible_mass * length(sorted_points)))
-	nCIs = length(sorted_points) - ciIdxInc
-	ciWidth = repeat([0.0],nCIs)
-	for i in range(1, stop=nCIs)
-		ciWidth[i] = sorted_points[i + ciIdxInc] - sorted_points[i]
-	end
-	HDImin = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)]
-	HDImax = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)+ciIdxInc]
-	return([HDImin, HDImax])
-end
-  
+
 
 
 
