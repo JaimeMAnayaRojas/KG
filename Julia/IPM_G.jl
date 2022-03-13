@@ -1,8 +1,3 @@
-
-
-
-
-
 function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0)
 	
 	# nBigMatrix = 100
@@ -62,15 +57,10 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 	)
 
-
 	pars_NR_G.α_surv = pars_NR_G.α_surv .+ post.b_NK_survG
 	pars_NR_G.βz_surv = pars_NR_G.βz_surv .+ post.b_zNK_survG 
-
-
 	pars_NR_G.α_grow = pars_NR_G.α_grow .+ post.b_NK_growG
 	pars_NR_G.βz_grow = pars_NR_G.βz_grow .+ post.b_zNK_growG 
-
-
 	pars_NR_G.α_fec = pars_NR_G.α_fec .+ post.b_NK_recrG
 	pars_NR_G.βz_fec = pars_NR_G.βz_fec .+ post.b_zNK_recrG 
 
@@ -112,7 +102,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		return(p)
 	end
 
-	#s_z(pars_GR_G, z, size_cen, 1, 0.0, 0.)
+	s_z(pars_GR_G, z, size_cen, 1)
 
 	## Reproduction function, logistic regression
 	# function pb_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
