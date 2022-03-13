@@ -139,7 +139,7 @@ pB = bar(df.X, df.median, label = false, group = df.X, color = :lightgray,# [:wh
 title = "c)", titleloc=:left, titlefont = 10)
 #ylabel!("Fitness contribution (Δλ)")
 #xlabel!("Vital rate")
-xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z)", "R(z)", "O(z)"], tickfontrotation = 0.5)
+xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z, z')", "R(z)", "O(z)"], tickfontrotation = 0.5)
 plot!([0, 6], [0,0], c = :black,  lab = false, linewidth = 1)
 
 plot!([0.5, 0.5, NaN, 1.95, 1.95, NaN, 3.4, 3.4, NaN, 4.8, 4.8, NaN, 6.25, 6.25], 
@@ -165,7 +165,7 @@ df[5, :l68], df[5, :u68]],
  	title = "e)", titleloc=:left, titlefont = 10)
  ylabel!("∑Δλ")
  xlabel!("Vital rate")
- xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z)", "R(z)", "O(z)"])
+ xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z, z')", "R(z)", "O(z)"])
  plot!([0, 6], [0,0], c = :black,  lab = false, linewidth = 1)
  
  plot!([0.5, 0.5, NaN, 1.95, 1.95, NaN, 3.4, 3.4, NaN, 4.8, 4.8, NaN, 6.25, 6.25], 
@@ -230,7 +230,8 @@ l68 = round.(Vector(ci68[1, :]), digits =3),
 u68 = round.(Vector(ci68[2, :]), digits =3),
 u95 = round.(Vector(ci95[2, :]), digits =3),
 u99 = round.(Vector(ci99[2, :]), digits =3));
-plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.2, label = "G(z)", linewidth = 2)
+
+plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.2, label = "G(z, z')", linewidth = 2)
 
 
 
@@ -340,7 +341,7 @@ l = @layout [
 using Plots.Measures
 plot(pA, pD, pB,  pE ,pC,
     layout = l, size = (600, 800), titlefont = 11, foreground_color_legend = nothing, 
-    margin = [2mm 3mm],
+    margin = [2mm 3mm]
 )
 
 
