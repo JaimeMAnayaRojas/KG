@@ -19,6 +19,8 @@ size_loss = Vector(mapcols(x -> LOS(x, 0), vm)[1,:])
 minimum(size_loss)
 z1[findall(size_loss .< 17)]
 
+
+println(DataFrame(z=  z1, los= size_loss))
 histogram(size_loss, bin = 20)
 
 pF2G = plot(z1, size_loss, label = "S(z)", legend =:right, title = "a)", titleloc = :left)

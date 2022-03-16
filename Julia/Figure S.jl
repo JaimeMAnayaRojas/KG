@@ -35,6 +35,28 @@ post = CSV.read("Posteriors.csv", DataFrame)# Statistical analyses
 DataG = CSV.read("data/GuppyIMP.csv", DataFrame);
 DataK = CSV.read("data/KillifishIPM.csv", DataFrame);
 
+
+a = filter(:KG => x -> x == 1, DataG)
+pSG = histogram(a.SL1_mm, label = "KG", bins= 50, alpha = 0.5, 
+title = "a) Guppy", titlefont = font(10), titleloc = :left)
+a = filter(:NK => x -> x == 1, DataG)
+histogram!(a.SL1_mm, label = "NK", bins= 50, alpha = 0.5)
+
+a = filter(:KG => x -> x == 1, DataK)
+pSK = histogram(a.SL1_mm, label = "KG", titlefont = font(10),  
+bins= 50, title = "b) Killifish", titleloc = :left, alpha = 0.5)
+a = filter(:NG => x -> x == 1, DataK)
+histogram!(a.SL1_mm, label = "NG",  bins= 50, alpha = 0.5)
+
+
+plot(pSG, pSK, layout = (2,1))
+xlabel!("Size (mm)")
+ylabel!("Frequency (N)")
+
+
+
+
+
 # size clases
 # Guppy
 nBigMatrix = 100
@@ -251,7 +273,7 @@ linewidth = 3, label = false)
 # xlabel!("Guppy initial size \n (mm)")
 ylabel!("Final size \n (mm)")
 
-scatter!(DataG.SL1_mm, DataG.SL2_mm, groups = DataG.NK, c= [:lightskyblue, :orange], alpha = 0.8, label =false)
+scatter!(DataG.SL1_mm, DataG.SL2_mm, groups = DataG.NK, c= [:lightskyblue, :red], alpha = 0.8, label =false)
 
 
 # Killifish
