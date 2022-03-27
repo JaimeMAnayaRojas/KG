@@ -2,6 +2,17 @@
 library(rethinking)
 library(data.table)
 rm(list=ls(all=TRUE))
+
+# Functions
+LOS <- function(x=NULL){
+  
+  out =   (length(which(x > 0)) / length(x))*100
+  
+  return(round(out, 3))
+  
+}
+
+
 ###########################################################################################################
 # First get the data
 getwd()
@@ -140,24 +151,12 @@ data_stan = list(
 
  modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4, 
                  iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
+ saveRDS(modG, "outputs/Model_KG.RDS")
+ 
 
- 
- saveRDS(modG, "Model_KG.RDS")
- 
- modG = readRDS("Model_KG.RDS")
- 
+ modG = readRDS("outputs/Model_KG.RDS")
  sum = as.data.frame(precis(modG, digits = 5, prob = .95, depth = 2))
  sum$Pars = rownames(sum)
- 
- LOS <- function(x=NULL){
-   
-   out =   (length(which(x > 0)) / length(x))*100
-   
-   return(round(out, 3))
-   
- }
- 
- 
  
 precis(modG, digits = 5, prob = .95, depth = 2)
 
@@ -169,7 +168,7 @@ precis(modG, digits = 5, prob = .95, depth = 2)
 #
 
 post <- as.data.frame(extract(modG))
-write.csv(as.data.frame(post), "Posteriors.csv")
+write.csv(as.data.frame(post), "outputs/Posteriors.csv")
 
 PP = as.vector(apply(as.data.frame(post), 2, LOS))
 
@@ -184,4 +183,4 @@ model.summary[model.summary$`2.5%` > 0,]
 model.summary
 
 model.summary[model.summary$LOS_l > 90,] 
-write.csv(model.summary, "Model_sum.csv")
+write.csv(model.summary, "outputs/Model_sum.csv")
