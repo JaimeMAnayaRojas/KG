@@ -13,12 +13,10 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	h = (U - L)/m
 	z1 = zeros(nBigMatrix)
 	z1 =  L .+ (collect(1:m) .- 0.5) * h
-
-
 	z = z1
-	meshpts = z1
+	
 
-	pars_GR_G = select(post,
+	pars_KG_G = select(post,
     	:Intercept_survG => :"α_surv",
     	:b_z_survG => :"βz_surv",
     	:b_area_survG => :"β_area_surv",
@@ -37,7 +35,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	)		
 
 
-	pars_NR_G = select(post,
+	pars_NK_G = select(post,
 		:Intercept_survG => :"α_surv",
 		:b_z_survG => :"βz_surv",
 		:b_area_survG => :"β_area_surv",
@@ -57,15 +55,14 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 	)
 
-	pars_NR_G.α_surv = pars_NR_G.α_surv .+ post.b_NK_survG
-	pars_NR_G.βz_surv = pars_NR_G.βz_surv .+ post.b_zNK_survG 
-	pars_NR_G.α_grow = pars_NR_G.α_grow .+ post.b_NK_growG
-	pars_NR_G.βz_grow = pars_NR_G.βz_grow .+ post.b_zNK_growG 
-	pars_NR_G.α_fec = pars_NR_G.α_fec .+ post.b_NK_recrG
-	pars_NR_G.βz_fec = pars_NR_G.βz_fec .+ post.b_zNK_recrG 
+	pars_NK_G.α_surv = pars_NK_G.α_surv .+ post.b_NK_survG
+	pars_NK_G.βz_surv = pars_NK_G.βz_surv .+ post.b_zNK_survG 
+	pars_NK_G.α_grow = pars_NK_G.α_grow .+ post.b_NK_growG
+	pars_NK_G.βz_grow = pars_NK_G.βz_grow .+ post.b_zNK_growG 
+	pars_NK_G.α_fec = pars_NK_G.α_fec .+ post.b_NK_recrG
+	pars_NK_G.βz_fec = pars_NK_G.βz_fec .+ post.b_zNK_recrG 
 
 
-	df = nothing
 	function g_z1z(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
 		size_cen::AbstractFloat, row::Integer)
 		α= df.α_grow[row]
@@ -83,8 +80,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	end
 
 
-	#@time g = g_z1z(pars_GR_G, z1, z, size_cen, row, 0.0, 0.0)
-
+	#@time g = g_z1z(pars_KG_G, z1, z, size_cen, row, 0.0, 0.0)
 	# columns should sum to 1
 	#sum.(eachcol(g))
 
@@ -102,7 +98,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		return(p)
 	end
 
-	s_z(pars_GR_G, z, size_cen, 1)
+	s_z(pars_KG_G, z, size_cen, 1)
 
 	## Reproduction function, logistic regression
 	# function pb_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
@@ -180,13 +176,13 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		return(out)
 	end
 
-	#mat = IPM_GR["K"]
+	#mat = IPM_KG["K"]
 
 
 
 	Gsurv_mat = zeros(size(post)[1], nBigMatrix)
 	Ggrow_mat = zeros(size(post)[1], nBigMatrix)
-	#Grep_mat = zeros(size(pars_GR_G)[1], nBigMatrix)
+	#Grep_mat = zeros(size(pars_KG_G)[1], nBigMatrix)
 	Gfec_mat = zeros(size(post)[1], nBigMatrix)
 	Grcz_mat = zeros(size(post)[1], nBigMatrix)
 
@@ -194,7 +190,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 
 
 	Gres_IPM = DataFrame(zeros(size(post)[1], 15), :auto)
-	Gres_IPM = select(Gres_IPM, :x1 => "lam_GR", :x2 => "lam_NR", :x3 => "delta_lam",
+	Gres_IPM = select(Gres_IPM, :x1 => "lam_KG", :x2 => "lam_NK", :x3 => "delta_lam",
 						:x4 => "sum_lam_eff", :x5 => "grow_con", :x6 => "fec_con", 
 						:x7 => "rcz_con", :x8 => "sur_con",
 						:x9 => "sum_con")
@@ -202,65 +198,65 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
     
 	for row in 1:size(post)[1]
 		# Make projection kernels
-		IPM_GR = mk_K(pars_GR_G, z1, z, size_cen, row)
-		IPM_NR = mk_K(pars_NR_G, z1, z, size_cen, row)
+		IPM_KG = mk_K(pars_KG_G, z1, z, size_cen, row)
+		IPM_NK = mk_K(pars_NK_G, z1, z, size_cen, row)
 		# calculate the population growth rate (λ)
 
-		vv_GR = eigen(IPM_GR["K"])
-		vv_NR = eigen(IPM_NR["K"])
+		vv_KG = eigen(IPM_KG["K"])
+		vv_NK = eigen(IPM_NK["K"])
 
-		λ_GR = real(vv_GR.values[end])
-		λ_NR = real(vv_NR.values[end])
-		Gres_IPM.lam_GR[row] = λ_GR
-		Gres_IPM.lam_NR[row] = λ_NR
+		λ_KG = real(vv_KG.values[end])
+		λ_NK = real(vv_NK.values[end])
+		Gres_IPM.lam_KG[row] = λ_KG
+		Gres_IPM.lam_NK[row] = λ_NK
 
 		## calculate average matrix
-		K_avg = (IPM_NR["K"] + IPM_GR["K"])./2
+		K_avg = (IPM_NK["K"] + IPM_KG["K"])./2
 		vv_avg = eigen(K_avg)
 
 		# Normalize stable size distribution
-		ω_GR = real(vv_GR.vectors[:, end]) 
-		ω_NR = real(vv_NR.vectors[:, end]) 
+		ω_KG = real(vv_KG.vectors[:, end]) 
+		ω_NK = real(vv_NK.vectors[:, end]) 
 		ω_avg = real(vv_avg.vectors[:, end]) 
 
 		# Reproductive value
-		a_GR = eigen(transpose(IPM_GR["K"]))
-		a_NR = eigen(transpose(IPM_NR["K"]))
+		a_KG = eigen(transpose(IPM_KG["K"]))
+		a_NK = eigen(transpose(IPM_NK["K"]))
 		a_avg = eigen(transpose(K_avg))
 
-		v_GR = real(a_GR.vectors[:, end]) 
-		v_NR = real(a_NR.vectors[:, end])
+		v_KG = real(a_KG.vectors[:, end]) 
+		v_NK = real(a_NK.vectors[:, end])
 		v_avg = real(a_avg.vectors[:, end]) / sum(real(a_avg.vectors[:, end]))
 		v_avg = v_avg / dot(transpose(v_avg), ω_avg)
 
 		## Sensitivity matrix
 
 		sens_avg = v_avg * ω_avg' # this equivalent to outer() in R
-		ΔK = IPM_NR["K"] - IPM_GR["K"]
+		ΔK = IPM_NK["K"] - IPM_KG["K"]
 		λ_eff = ΔK .* sens_avg
 		Δλ = sum(λ_eff)
 		
 
 		Gres_IPM.sum_lam_eff[row] = Δλ
-		Gres_IPM.delta_lam[row] = λ_NR - λ_GR
+		Gres_IPM.delta_lam[row] = λ_NK - λ_KG
 
 		## Make life-response table
 
 		one_mat = ones(nBigMatrix, nBigMatrix)
 
 		# Function differences
-		Δ_grow = g_z1z(pars_NR_G, z1, z, size_cen, row) - g_z1z(pars_GR_G, z1, z, size_cen, row)
-		#Δ_rep = one_mat*(pb_z(pars_NR_G, z, size_cen, row) - pb_z(pars_GR_G, z, size_cen, row))
-		Δ_fec = one_mat*(pr_z(pars_NR_G, z, size_cen, row) - pr_z(pars_GR_G, z, size_cen, row))
-		Δ_rcz = (c_z1z(pars_NR_G, z1, z, size_cen, row) - c_z1z(pars_GR_G, z1, z, size_cen, row))
-		Δ_sur = one_mat*(s_z(pars_NR_G, z, size_cen, row) - s_z(pars_GR_G, z, size_cen, row))
+		Δ_grow = g_z1z(pars_NK_G, z1, z, size_cen, row) - g_z1z(pars_KG_G, z1, z, size_cen, row)
+		#Δ_rep = one_mat*(pb_z(pars_NK_G, z, size_cen, row) - pb_z(pars_KG_G, z, size_cen, row))
+		Δ_fec = one_mat*(pr_z(pars_NK_G, z, size_cen, row) - pr_z(pars_KG_G, z, size_cen, row))
+		Δ_rcz = (c_z1z(pars_NK_G, z1, z, size_cen, row) - c_z1z(pars_KG_G, z1, z, size_cen, row))
+		Δ_sur = one_mat*(s_z(pars_NK_G, z, size_cen, row) - s_z(pars_KG_G, z, size_cen, row))
 
 		# Function averages
-		grow_avg = (g_z1z(pars_NR_G, z1, z, size_cen, row) + g_z1z(pars_GR_G, z1, z, size_cen, row))/2
-		#rep_avg = (one_mat*(pb_z(pars_NR_G, z, size_cen, row) + pb_z(pars_GR_G, z, size_cen, row)))/2
-		fec_avg = (one_mat*(pr_z(pars_NR_G, z, size_cen, row) + pr_z(pars_GR_G, z, size_cen, row)))/2
-		rcz_avg = ((c_z1z(pars_NR_G, z1, z, size_cen, row) + c_z1z(pars_GR_G, z1, z, size_cen, row)))/2
-		sur_avg = (one_mat*(s_z(pars_NR_G, z, size_cen, row) + s_z(pars_GR_G, z, size_cen, row)))/2
+		grow_avg = (g_z1z(pars_NK_G, z1, z, size_cen, row) + g_z1z(pars_KG_G, z1, z, size_cen, row))/2
+		#rep_avg = (one_mat*(pb_z(pars_NK_G, z, size_cen, row) + pb_z(pars_KG_G, z, size_cen, row)))/2
+		fec_avg = (one_mat*(pr_z(pars_NK_G, z, size_cen, row) + pr_z(pars_KG_G, z, size_cen, row)))/2
+		rcz_avg = ((c_z1z(pars_NK_G, z1, z, size_cen, row) + c_z1z(pars_KG_G, z1, z, size_cen, row)))/2
+		sur_avg = (one_mat*(s_z(pars_NK_G, z, size_cen, row) + s_z(pars_KG_G, z, size_cen, row)))/2
 
 		# derivates
 
@@ -291,7 +287,6 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		# to put in a DataFrame
 		sur_con = sum(λ_sur)
 		grow_con = sum(λ_grow)
-		#rep_con = sum(λ_rep)
 		fec_con = sum(λ_fec)
 		rcz_con = sum(λ_rcz)
 		sum_con = sur_con + grow_con + fec_con + rcz_con
@@ -299,13 +294,11 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		Gres_IPM.sum_con[row] = sum_con
 		Gres_IPM.sur_con[row] = sur_con
 		Gres_IPM.grow_con[row] = grow_con
-		#Gres_IPM.rep_con[row] = rep_con
 		Gres_IPM.fec_con[row] = fec_con
 		Gres_IPM.rcz_con[row] = rcz_con
 
 		Gsurv_mat[row, : ] =  sum.(eachcol(λ_sur)) 
 		Ggrow_mat[row, : ] =  sum.(eachcol(λ_grow)) 
-		#rep_mat[row, : ] =  sum.(eachcol(λ_rep)) 
 		Gfec_mat[row, : ] =  sum.(eachcol(λ_fec)) 
 		Grcz_mat[row, : ] =  sum.(eachcol(λ_rcz)) 
 

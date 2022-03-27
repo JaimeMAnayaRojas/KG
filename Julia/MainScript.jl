@@ -5,79 +5,78 @@ using LinearAlgebra
 using StatsPlots
 using JLD2
 using RCall
-
-function HDI(samples; credible_mass=0.95)
-	# Computes highest density interval from a sample of representative values,
-	# estimated as the shortest credible interval
-	# Takes Arguments posterior_samples (samples from posterior) and credible mass (normally .95)
-	# Originally from https://stackoverflow.com/questions/22284502/highest-posterior-density-region-and-central-credible-region
-	# Adapted to Julialang
-	sorted_points = sort(samples)
-	ciIdxInc = Int(ceil(credible_mass * length(sorted_points)))
-	nCIs = length(sorted_points) - ciIdxInc
-	ciWidth = repeat([0.0],nCIs)
-	for i in range(1, stop=nCIs)
-		ciWidth[i] = sorted_points[i + ciIdxInc] - sorted_points[i]
-	end
-	HDImin = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)]
-	HDImax = sorted_points[findfirst(isequal(minimum(ciWidth)),ciWidth)+ciIdxInc]
-	return([HDImin, HDImax])
-end
+using Plots
+using Plots.Measures
 
 
-function LOS(v, b = 0)
-	return 100*length(findall(v .> b)) ./length(v)
-end
-
-
+# Set the working directory to my folder
 cd("$(homedir())")
-cd("Dropbox/Projects_JM/FSU/Pool_manipulation/KG_git/")
+cd("Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 pwd()
 
+# load my functions
+include("Functions.jl")
 
+
+
+
+## Run the Bayesian model via rstan.
 # R"""
 #     source("R/MainScript.R")
 # """
 # @rget post
+
+
+# Load the posteriors from the model
+post = CSV.read("Posteriors.csv", DataFrame)
 # I am running the models in stan via R, and getting the posteriors for the guppy and killifish IPM# 
 
 
-
-include("IPM_G.jl") # run from IED
-include("IPM_K.jl")
  
 
+# Test the IPM functions, 
+# This also helps compiling the functions early and then the calculation faster. 
+# In Julia the first time a function is used it takes a bit of time, after that it becomes faster and faster
 # Run both IPM models
 
-# IPMs = [Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen = 18.0),
-# Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)]
+# @time Guppy_IPM(post[1:3,:]; nBigMatrix = 100, min_size = 2, max_size = 45, size_cen = 18.0) # 
+# @time Killifish_IPM(post[1:3,:]; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)
+
+
+ nBigMatrix = 100
+# IPMs = [Guppy_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 45, size_cen = 18.0),
+# Killifish_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 110, size_cen = 18.0)]
 
 ## Save the IPMs
 # @save "IPMs.jld2" IPMs  
+
+## load the IPMs
 @load "IPMs.jld2" IPMs  
 
 
 ##### Figures vital rates
 
 f1 = include("Man_plots.jl")
-
 savefig(f1, "Figure 1.png")
 
 sTab[1][:,:Species] = fill("Guppy", size(sTab[1])[1])
 sTab[2][:,:Species] = fill("Kilifish", size(sTab[2])[1])
-
 sumTab = sTab[1]
-
 append!(sumTab, sTab[2])
-
 println(sumTab)
 CSV.write("Summary_statsIPM.csv", sumTab )
 
 
 include("Figure_2.jl")
+ylabel!("LOS (%) \n ΔV > 0 ")
 savefig("Figure 2.png")
 
 
 include("Figure S.jl")
+savefig("Figure S2.png")
 
+
+plot(pSG, pSK, layout = (2,1))
+xlabel!("Size (mm)")
+ylabel!("Frequency (N)")
 savefig("Figure S1.png")

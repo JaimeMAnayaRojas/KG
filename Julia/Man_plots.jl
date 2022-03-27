@@ -148,7 +148,7 @@ df[2, :l95], df[2, :u95], NaN,
 df[3, :l95], df[3, :u95], NaN,
 df[4, :l95], df[4, :u95], NaN,
 df[5, :l95], df[5, :u95]],
- c = :gray,  lab = false, linewidth = 1.5)
+ c = :black,  lab = false, linewidth = 1.5)
 
 plot!([0.5, 0.5, NaN, 1.95, 1.95, NaN, 3.4, 3.4, NaN, 4.8, 4.8, NaN, 6.25, 6.25], 
 [df[1, :l68], df[1, :u68], NaN,
@@ -156,13 +156,13 @@ df[2, :l68], df[2, :u68], NaN,
 df[3, :l68], df[3, :u68], NaN,
 df[4, :l68], df[4, :u68], NaN,
 df[5, :l68], df[5, :u68]],
- c = :gray,  lab = false, linewidth = 4)
+ c = :black,  lab = false, linewidth = 4)
  ylabel!("∑ Δλ")
 
 
  df = filter(:Species => x -> x == "Killifish", KG_tab)
  pC = bar(df.X, df.median, label = false, group = df.X, color = :lightgray, # [:white :red :deepskyblue2 :blue :black], 
- 	title = "e)", titleloc=:left, titlefont = 10)
+ 	title = "d)", titleloc=:left, titlefont = 10)
  ylabel!("∑Δλ")
  xlabel!("Vital rate")
  xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z, z')", "R(z)", "O(z)"])
@@ -174,7 +174,7 @@ df[5, :l68], df[5, :u68]],
  df[3, :l95], df[3, :u95], NaN,
  df[4, :l95], df[4, :u95], NaN,
  df[5, :l95], df[5, :u95]],
-  c = :gray,  lab = false, linewidth = 1.5)
+  c = :black,  lab = false, linewidth = 1.5)
  
  plot!([0.5, 0.5, NaN, 1.95, 1.95, NaN, 3.4, 3.4, NaN, 4.8, 4.8, NaN, 6.25, 6.25], 
  [df[1, :l68], df[1, :u68], NaN,
@@ -182,12 +182,12 @@ df[5, :l68], df[5, :u68]],
  df[3, :l68], df[3, :u68], NaN,
  df[4, :l68], df[4, :u68], NaN,
  df[5, :l68], df[5, :u68]],
-  c = :gray,  lab = false, linewidth = 4)
+  c = :black,  lab = false, linewidth = 4)
  
 ##### Size contributions
 
 ## Guppy# size-speficif LTRE
-	nBigMatrix = 100
+	# nBigMatrix = 100
 	min_size = 4
 	max_size = 35
 	size_cen = 18.0
@@ -231,10 +231,7 @@ u68 = round.(Vector(ci68[2, :]), digits =3),
 u95 = round.(Vector(ci95[2, :]), digits =3),
 u99 = round.(Vector(ci99[2, :]), digits =3));
 
-plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.2, label = "G(z, z')", linewidth = 2)
-
-
-
+plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.2, label = "G(z,z')", linewidth = 2)
 
 
 vm= DataFrame(IPMs[1][4], :auto)
@@ -259,7 +256,7 @@ ylabel!("Δλ")
 
 # Killifish
 # size-speficif LTRE
-nBigMatrix = 100
+# nBigMatrix = 100
 min_size = 2
 max_size = 110
 size_cen = 18.0
@@ -322,7 +319,7 @@ u95 = round.(Vector(ci95[2, :]), digits =3),
 u99 = round.(Vector(ci99[2, :]), digits =3));
 plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.2, 
 label = false, linewidth = 2, 
-title = "d)", 
+title = "e)", 
 titleloc= :left, titilefont = 9
 )
 xlabel!("Killifish size (mm)")
@@ -339,7 +336,7 @@ l = @layout [
 ]
 
 using Plots.Measures
-plot(pA, pD, pB,  pE ,pC,
+plot(pA, pB, pD, pC, pE,
     layout = l, size = (600, 800), titlefont = 11, foreground_color_legend = nothing, 
     margin = [2mm 3mm]
 )

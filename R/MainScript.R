@@ -5,7 +5,7 @@ rm(list=ls(all=TRUE))
 ###########################################################################################################
 # First get the data
 getwd()
-setwd("~/Dropbox/Projects_JM/FSU/Pool_manipulation/KG_git/")
+setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 
 Gdata <- read.csv("data/GuppyIMP.csv")
 Kdata <- read.csv("data/KillifishIPM.csv")
@@ -142,6 +142,12 @@ data_stan = list(
                  iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
 
  
+ saveRDS(modG, "Model_KG.RDS")
+ 
+ modG = readRDS("Model_KG.RDS")
+ 
+ sum = as.data.frame(precis(modG, digits = 5, prob = .95, depth = 2))
+ sum$Pars = rownames(sum)
  
  LOS <- function(x=NULL){
    
