@@ -28,7 +28,7 @@ include("Functions.jl")
 
 
 # Load the posteriors from the model
-post = CSV.read("Posteriors.csv", DataFrame)
+post = CSV.read("outputs/Posteriors.csv", DataFrame)
 # I am running the models in stan via R, and getting the posteriors for the guppy and killifish IPM# 
 
 
@@ -48,35 +48,35 @@ post = CSV.read("Posteriors.csv", DataFrame)
 # Killifish_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 110, size_cen = 18.0)]
 
 ## Save the IPMs
-# @save "IPMs.jld2" IPMs  
+# @save "outputs/IPMs.jld2" IPMs  
 
 ## load the IPMs
-@load "IPMs.jld2" IPMs  
+@load "outputs/IPMs.jld2" IPMs  
 
 
 ##### Figures vital rates
 
 f1 = include("Man_plots.jl")
-savefig(f1, "Figure 1.png")
+savefig(f1, "plots/Figure 1.png")
 
 sTab[1][:,:Species] = fill("Guppy", size(sTab[1])[1])
 sTab[2][:,:Species] = fill("Kilifish", size(sTab[2])[1])
 sumTab = sTab[1]
 append!(sumTab, sTab[2])
 println(sumTab)
-CSV.write("Summary_statsIPM.csv", sumTab )
+CSV.write("outputs/Summary_statsIPM.csv", sumTab )
 
 
 include("Figure_2.jl")
 ylabel!("LOS (%) \n ΔV > 0 ")
-savefig("Figure 2.png")
+savefig("plots/Figure 2.png")
 
 
 include("Figure S.jl")
-savefig("Figure S2.png")
+savefig("plots/Figure S2.png")
 
 
 plot(pSG, pSK, layout = (2,1))
 xlabel!("Size (mm)")
 ylabel!("Frequency (N)")
-savefig("Figure S1.png")
+savefig("plots/Figure S1.png")
