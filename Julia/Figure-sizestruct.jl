@@ -154,8 +154,13 @@ xlabel!("Size (mm")
 plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 8, layout = (4,2), size = (600, 700))
 ylims!((0,25))
 xlims!((5,32))
-
 savefig("plots/Figure_S3.png")
+
+
+plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 8, layout = (4,2), size = (600, 700))
+#ylims!((0,25))
+xlims!((5,32))
+savefig("plots/Figure_S3b.png")
 
 
 
@@ -288,5 +293,9 @@ xlabel!("Size (mm")
 plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 12, layout = (4,2), size = (600, 700))
 ylims!((0,40))
 xlims!((5,100))
-
 savefig("plots/Figure_S4.png")
+
+plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 12, layout = (4,2), size = (600, 700))
+#ylims!((0,40))
+xlims!((5,100))
+savefig("plots/Figure_S4b.png")
