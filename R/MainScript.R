@@ -183,4 +183,5 @@ model.summary[model.summary$`2.5%` > 0,]
 model.summary
 
 model.summary[model.summary$LOS_l > 90,] 
+model.summary[model.summary$LOS_l < 10,] 
 write.csv(model.summary, "outputs/Model_sum.csv")

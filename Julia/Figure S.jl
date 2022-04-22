@@ -5,6 +5,7 @@ DataG = CSV.read("data/GuppyIMP.csv", DataFrame);
 DataK = CSV.read("data/KillifishIPM.csv", DataFrame);
 
 
+
 a = filter(:KG => x -> x == 1, DataG)
 pSG = histogram(a.SL1_mm, label = "KG", bins= 50, alpha = 0.5, 
 title = "a) Guppy", titlefont = font(10), titleloc = :left)
