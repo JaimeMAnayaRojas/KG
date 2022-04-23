@@ -14,6 +14,17 @@ Kz = CSV.read( "data/01_KillifishField_data.csv", DataFrame)
 
 
 println(describe(Gz))
+
+replace!(Gz.Mark, missing=>"NaN")
+replace!(Kz.Mark, missing=>"NaN")
+
+filter!(:Mark => x -> x !="others", Gz)
+filter!(:Mark => x -> x !="others", Kz)
+
+Gz.Mark = categorical(Gz.Mark)
+Kz.Mark = categorical(Kz.Mark)
+
+
 replace!(Gz.SL1_mm, missing=>NaN)
 replace!(Gz.SL2_mm, missing=>NaN)
 
@@ -33,269 +44,496 @@ Gz.Location = categorical(Gz.Location)
 
 
 # Caigual
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "CAI", Gz)
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI", Gz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1a = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "Before (105)",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "Introduced (82)")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Gz
+)
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1a = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "t₀ (105)")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "t₁ (109)", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "Recovered (51)", 
         titlefont = font(10),  
         title = "a) Caigual-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
 
 
-p = filter([:NK, :Location] => (x,y) -> x == 1 && y == "CAI", Gz)
+# Caigual NK
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI", Gz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1b = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "103",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "92")
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Gz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-
-p1b = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "103")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "170", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "57", 
         titlefont = font(10),  
         title = "b) Caigual-NK", titleloc = :left
 )
 
-# Naranjo (NAR)
-
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "NAR", Gz)
+# Naranjo KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR", Gz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1c = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "90",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "51")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Gz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1c = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "90")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "93", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "25", 
         titlefont = font(10),  
         title = "c) Naranjo-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
 
 
-p = filter([:NK, :Location] => (x,y) -> x == 1 && y == "NAR", Gz)
+# Naranjo NK
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR", Gz
+)
+
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1d = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "34",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "25")
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Gz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1d = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "34")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "84", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "20", 
         titlefont = font(10),  
         title = "d) Naranjo-NK", titleloc = :left
 )
 
-
-
-# Quare 1 (QUA)
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "QUA", Gz)
+## Quare 1 KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA", Gz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1e = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "60",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Gz
+)
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "51")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Gz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-
-p1e = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "60")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "95", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "44", 
         titlefont = font(10),  
-        title = "e) Quare 1-KG", titleloc = :left
+        title = "e) Quare-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
 
 
-p = filter([:NK, :Location] => (x,y) -> x == 1 && y == "QUA", Gz)
+# Quare NK
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA", Gz
+)
+
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1f = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "83",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "63")
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Gz
+)
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1f = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "83")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "132", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "48", 
         titlefont = font(10),  
-        title = "f) Quare 1-NK", titleloc = :left
+        title = "f) Quare-NK", titleloc = :left
 )
 
 
+## Quare 2 KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2", Gz
+)
 
-# Quare 2 (QUA2)
-
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "QUA2", Gz)
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1g = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "16",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Gz
+)
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "16")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Gz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1g = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "16")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "10", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "10", 
         titlefont = font(10),  
         title = "g) Quare 2-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
-
-xlabel!("Size (mm")
-
-p = filter([:NK, :Location] => (x,y) -> x == 1 && y == "QUA2", Gz)
-length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
-length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+xlabel!("Size (mm)")
 
 
-p1h = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "39")
+# Quare NK
 
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "28", 
-        titlefont = font(10),  
-        title = "f) Quare 1-NK", titleloc = :left
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2", Gz
 )
-xlabel!("Size (mm")
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1h = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "39",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Gz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "39")
+
+p = filter([:NK, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Gz
+)
+
+length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "28", 
+        titlefont = font(10),  
+        title = "h) Quare 2-NK", titleloc = :left
+)
+
+xlabel!("Size (mm)")
 
 
-plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 8, layout = (4,2), size = (600, 700))
-ylims!((0,25))
-xlims!((5,32))
+## put everythnig together
+
+plot(p1a, p1c, p1b, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
+xlims!((5,30))
 savefig("plots/Figure_S3.png")
 
 
-plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 8, layout = (4,2), size = (600, 700))
-#ylims!((0,25))
-xlims!((5,32))
+plot(p1a, p1c, p1b, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
+ylims!((0,20))
 savefig("plots/Figure_S3b.png")
 
 
 
-
+### Killifish size
 # Caigual
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "CAI", Kz)
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI", Kz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1ak = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "Before (16)",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Kz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "Introduced (11)")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Kz
+)
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1a = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "t₀ (12)")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "t₁ (10)", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "Recovered (6)", 
         titlefont = font(10),  
         title = "a) Caigual-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
+ylims!((0,6))
 
 
-p = filter([:NG, :Location] => (x,y) -> x == 1 && y == "CAI", Kz)
+# Caigual NK
 
-length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
-length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-
-p1b = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "17")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "18", 
-        titlefont = font(10),  
-        title = "b) Caigual-NG", titleloc = :left
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI", Kz
 )
 
-# Naranjo (NAR)
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1bk = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "17",
+ linewidth = 1.5, linestyle = :dot)
 
-
-unique(Kz.Location)
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "NAR", Kz)
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Kz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "17")
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "CAI" && w != "NaN", Kz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "10", 
+        titlefont = font(10),  
+        title = "b) Caigual-NK", titleloc = :left
+)
+ylims!((0,6))
 
-p1c = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "22")
 
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "26", 
+# Naranjo KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR", Kz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1ck = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "22",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Kz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "22")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Kz
+)
+
+
+length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "14", 
         titlefont = font(10),  
         title = "c) Naranjo-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
 
 
-p = filter([:NG, :Location] => (x,y) -> x == 1 && y == "NAR", Kz)
+# Naranjo NK
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR", Kz
+)
+
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
-length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+p1dk = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "28",
+ linewidth = 1.5, linestyle = :dot)
 
-p1d = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "28")
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Kz
+)
 
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "36", 
-        titlefont = font(10),  
-        title = "d) Naranjo-NG", titleloc = :left
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "28")
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "NAR" && w != "NaN", Kz
 )
 
 
+length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "14", 
+        titlefont = font(10),  
+        title = "d) Naranjo-NK", titleloc = :left
+)
 
-# Quare 1 (QUA)
-
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "QUA", Kz)
-
+## Quare 1 KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA", Kz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1ek = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "108",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Kz
+)
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "99")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Kz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-
-p1e = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "108")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "174", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "62", 
         titlefont = font(10),  
-        title = "e) Quare 1-KG", titleloc = :left
+        title = "e) Quare-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
 
-# WHY ARE THERE NOT KILLIFISH IN THIS POOL?
-p = filter([:NG, :Location] => (x,y) -> x == 1 && y == "QUA", Kz)
 
+# Quare NK
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA", Kz
+)
 
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1fk = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "66",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Kz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "57")
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA" && w != "NaN", Kz
+)
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1f = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "66")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "108", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "33", 
         titlefont = font(10),  
-        title = "f) Quare 1-NG", titleloc = :left
+        title = "f) Quare-NK", titleloc = :left
 )
 
 
+## Quare 2 KG
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2", Kz
+)
 
-# Quare 2 (QUA2)
-
-
-p = filter([:KG, :Location] => (x,y) -> x == 1 && y == "QUA2", Kz)
 length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1gk = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "49",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Kz
+)
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "49")
+
+p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Kz
+)
+
+
 length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
-
-p1g = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "49")
-
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "30", 
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "30", 
         titlefont = font(10),  
         title = "g) Quare 2-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
-
-xlabel!("Size (mm")
-
-p = filter([:NG, :Location] => (x,y) -> x == 1 && y == "QUA2", Kz)
-length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
-length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+xlabel!("Size (mm)")
 
 
-p1h = histogram(p.SL1_mm, bins = 30, alpha=0.4, color = :black, label = "25")
+# Quare NK
 
-histogram!(p.SL2_mm, bins = 30, alpha=0.5, color = :orange, label = "17", 
-        titlefont = font(10),  
-        title = "f) Quare 1-NG", titleloc = :left
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2", Kz
 )
-xlabel!("Size (mm")
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+p1hk = histogram(p.SL1_mm, bins = 30, alpha=1, color = :white, label = "25",
+ linewidth = 1.5, linestyle = :dot)
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Kz
+)
+
+length(p.SL1_mm) - length(findall(isnan.(p.SL1_mm)))
+
+histogram!(p.SL1_mm, bins = 30, alpha=0.5, color = :orange, label = "25")
+
+p = filter([:NG, :Location, :Mark] => (x,y,w) -> x == 1 && 
+        y == "QUA2" && w != "NaN", Kz
+)
+
+length(p.SL2_mm) - length(findall(isnan.(p.SL2_mm)))
+histogram!(p.SL2_mm, bins = 30, alpha=0.7, color = :gray, label = "17", 
+        titlefont = font(10),  
+        title = "h) Quare 2-NK", titleloc = :left
+)
+
+xlabel!("Size (mm)")
 
 
-plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 12, layout = (4,2), size = (600, 700))
-ylims!((0,40))
+## put everythnig together
+
+
+
+plot(p1ak, p1ck, p1bk, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 10, layout = (4,2), size = (700, 800))
 xlims!((5,100))
 savefig("plots/Figure_S4.png")
 
-plot(p1a, p1b, p1c, p1d,p1e,p1f,p1g,p1h, bins= 12, layout = (4,2), size = (600, 700))
-#ylims!((0,40))
+
+plot(p1ak, p1ck, p1bk, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 5, layout = (4,2), size = (700, 800))
+ylims!((0,18))
 xlims!((5,100))
 savefig("plots/Figure_S4b.png")

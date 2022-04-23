@@ -1,5 +1,5 @@
 
-post = CSV.read("Posteriors.csv", DataFrame)# Statistical analyses
+post = CSV.read("outputs/Posteriors.csv", DataFrame)# Statistical analyses
 
 DataG = CSV.read("data/GuppyIMP.csv", DataFrame);
 DataK = CSV.read("data/KillifishIPM.csv", DataFrame);
