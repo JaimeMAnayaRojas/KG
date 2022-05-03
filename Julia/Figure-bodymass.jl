@@ -29,11 +29,15 @@ replace!(Gz.mass1_gr, missing=>NaN)
 replace!(Gz.mass2_gr, missing=>NaN)
 
 
-
 replace!(Kz.mass1_gr, missing=>NaN)
 replace!(Kz.mass2_gr, missing=>NaN)
 
 
+Gz.mass1_gr = log10.(Gz.mass1_gr)
+Gz.mass2_gr = log10.(Gz.mass2_gr)
+
+Kz.mass1_gr = log10.(Kz.mass1_gr)
+Kz.mass2_gr = log10.(Kz.mass2_gr)
 
 
 filter!(:Location => x -> x !="JOE", Gz)
@@ -64,7 +68,7 @@ p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 &&
 )
 
 length(p.mass2_gr) - length(findall(isnan.(p.mass2_gr)))
-histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = "Recovered", 
+histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = "Recovered", legend =:topleft,
         titlefont = font(10),  
         title = "a) Caigual-KG", titleloc = :left
 )
@@ -241,8 +245,7 @@ histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = false,
         title = "g) Quare 2-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
-xlabel!("Size (gr)")
-
+xlabel!("Log₁₀(Body mass, gr)")
 
 # Quare NK
 
@@ -272,19 +275,20 @@ histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = false,
         title = "h) Quare 2-NK", titleloc = :left
 )
 
-xlabel!("Size (gr)")
+xlabel!("Log₁₀(Body mass, gr)")
 
+       
 
 ## put everythnig together
 
-plot(p1a, p1c, p1b, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
-xlims!((0,1))
+plot(p1a, p1b, p1c, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
+xlims!((-2.5,0))
 savefig("plots/Figure_S5.png")
 
 
-plot(p1a, p1c, p1b, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
-ylims!((0,25))
-xlims!((0,1))
+plot(p1a, p1b, p1c, p1d, p1e, p1f, p1g, p1h, bins = 10, layout = (4,2), size = (700, 800))
+ylims!((0,21))
+xlims!((-2.5,0))
 savefig("plots/Figure_S5b.png")
 
 
@@ -312,7 +316,7 @@ p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 &&
 
 length(p.mass2_gr) - length(findall(isnan.(p.mass2_gr)))
 histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = "Recovered", 
-        titlefont = font(10),  
+        titlefont = font(10),  legend = :topleft,
         title = "a) Caigual-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
@@ -491,7 +495,7 @@ histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = false,
         title = "g) Quare 2-KG", titleloc = :left
 )
 ylabel!("Frequency (N)")
-xlabel!("Size (gr)")
+xlabel!("Log₁₀(Body mass, gr)")
 
 
 # Quare NK
@@ -522,19 +526,20 @@ histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = false,
         title = "h) Quare 2-NK", titleloc = :left
 )
 
-xlabel!("Size (gr)")
+xlabel!("Log₁₀(Body mass, gr)")
+
 
 
 ## put everythnig together
 
 
 
-plot(p1ak, p1ck, p1bk, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 10, layout = (4,2), size = (700, 800))
-xlims!((-0.5,7))
-savefig("plots/Figure_S5.png")
+plot(p1ak, p1bk, p1ck, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 10, layout = (4,2), size = (700, 800))
+xlims!((-2,1))
+savefig("plots/Figure_S6.png")
 
 
-plot(p1ak, p1ck, p1bk, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 5, layout = (4,2), size = (700, 800))
-ylims!((0,40))
-xlims!((-0.5,7))
-savefig("plots/Figure_S5b.png")
+plot(p1ak, p1bk, p1ck, p1dk, p1ek, p1fk, p1gk, p1hk, bins = 5, layout = (4,2), size = (700, 800))
+ylims!((0,13))
+xlims!((-2,1))
+savefig("plots/Figure_S6b.png")

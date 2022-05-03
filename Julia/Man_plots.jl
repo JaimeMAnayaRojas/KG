@@ -136,7 +136,7 @@ KG_tab.X = ["A", "B", "C", "D", "E","A", "B", "C", "D", "E"]
 df = filter(:Species => x -> x == "Guppy", KG_tab)
 
 pB = bar(df.X, df.median, label = false, group = df.X, color = :lightgray,# [:white :red :deepskyblue2 :blue :black], 
-title = "c)", titleloc=:left, titlefont = 10)
+title = "b)", titleloc=:left, titlefont = 10)
 #ylabel!("Fitness contribution (Δλ)")
 #xlabel!("Vital rate")
 xticks!([0.5, 1.95, 3.4, 4.8, 6.25], ["All", "S(z)", "G(z, z')", "R(z)", "O(z)"], tickfontrotation = 0.5)
@@ -247,7 +247,7 @@ u95 = round.(Vector(ci95[2, :]), digits =3),
 u99 = round.(Vector(ci99[2, :]), digits =3));
 plot!(df[:,:size], df[:,:median], ribbon = [df[:, :l68] df[:, :u68] ], fillalpha = 0.1, 
     label = "R(z)", legend= :bottomright, linewidth = 2, 
-    title = "b)", 
+    title = "c)", 
     titleloc= :left, titilefont = 9
 )
 xlabel!("Guppy size (mm)")

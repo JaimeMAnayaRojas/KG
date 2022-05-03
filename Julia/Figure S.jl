@@ -18,7 +18,6 @@ bins= 50, title = "b) Killifish", titleloc = :left, alpha = 0.5)
 a = filter(:NG => x -> x == 1, DataK)
 histogram!(a.SL1_mm, label = "NG",  bins= 50, alpha = 0.5)
 
-
 plot(pSG, pSK, layout = (2,1))
 xlabel!("Size (mm)")
 ylabel!("Frequency (N)")

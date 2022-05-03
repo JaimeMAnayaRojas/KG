@@ -62,7 +62,38 @@ Gdata$stream <- factor(Gdata$Location)
 levels(Gdata$stream) <- 1:length(levels(Gdata$stream))
 Gdata$stream <- as.numeric(Gdata$stream)
 
+names(Gdata)
 
+# df = rbind(Gdata[,c("sp", "KG", "NK", "NG","SL1_mm", "mass1_gr")], Kdata[,c("sp", "KG", "NK", "NG","SL1_mm", "mass1_gr")])
+# 
+# df$Pool= factor(paste(df$NK, df$NG, sep = "-"))
+# levels(df$Pool) 
+# levels(df$Pool) = c("KG", "NG", "NK")
+# 
+# df$Poolsp = factor(paste(df$sp, df$Pool, sep= "-"))
+# 
+# df$z = log10(df$SL1_mm)
+# df$w = log10(df$mass1_gr)
+# library(ggpubr)
+# # Grouped Scatter plot with marginal density plots
+# ggscatterhist(
+#   df, x = "z", y = "w",
+#   color = "Pool", size = 2, alpha = 1,
+#   shape = "sp",
+#   palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+#   margin.params = list(fill = "Pool", color = "black", size = 0.2)
+# )
+
+df= Gdata[which(Gdata$Repr ==1),]
+
+library(brms)
+glimmer(Recr ~ z * NK + (1|stream), family = , df )
+
+summary(m1)
+conditional_effects(m1, effects = "z:NK")
+
+brms::stancode(m1)
+?rethinking
 
 data_stan = list(
   # variables size 
