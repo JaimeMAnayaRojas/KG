@@ -18,40 +18,52 @@ LOS <- function(x=NULL){
 getwd()
 setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 
+
+center = 18
+# Guppy data cleaning -----------------------------------------------------
+
 Gdata <- read.csv("data/GuppyIMP.csv")
 Kdata <- read.csv("data/KillifishIPM.csv")
 
-Gdata$z <- Gdata$SL1_mm - 18
+Gdata$z <- Gdata$SL1_mm - center
 Gdata$z1 <- Gdata$SL2_mm 
 Gdata <- Gdata[-which(Gdata$Sex2=="M"),]
+
+# Make sure the non reproductive have zeros
 Gdata$Recr[which(Gdata$Repr==0 & Gdata$surv ==1)] = 0
 
 
 
+# Killifish data cleaning -------------------------------------------------
 
-
-Kdata$z <- Kdata$SL1_mm - 18
+Kdata$z <- Kdata$SL1_mm - center
 Kdata$z1 <- Kdata$SL2_mm 
 
 
 Kdata <- Kdata[-which(Kdata$Sex2=="M"),]
+
+# Make sure the non reproductive have zeros
 Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
 
 
 
-meanA = mean(unique(c(Gdata$area, Kdata$are) ))
-sdA = sd(unique(c(Gdata$area, Kdata$area) ))
 
+# Normalize the covariates (killifish biomass and canopy) -----------------
 
-Gdata$area <- (Gdata$area - meanA) / sdA
-Kdata$area <- (Kdata$area - meanA) / sdA
+meanK = mean(unique(c(Gdata$BiomassKillifish, Kdata$BiomassKillifish) ))
+sdK = sd(unique(c(Gdata$BiomassKillifish, Kdata$BiomassKillifish) ))
+Gdata$BiomassK <- (Gdata$BiomassKillifish - meanK) / sdK
+Kdata$BiomassK <- (Kdata$BiomassKillifish - meanK) / sdK
 
 meanC = mean(unique(c(Gdata$canopy, Kdata$canopy) ))
 sdC = sd(unique(c(Gdata$canopy, Kdata$canopy) ))
-
 Gdata$canopy <- (Gdata$canopy - meanC) /  sdC
 Kdata$canopy <- (Kdata$canopy - meanC) /  sdC
 
+
+
+
+# Re-code the random effects (drainage id) --------------------------------
 
 
 Kdata$stream <- factor(Kdata$Location)
@@ -62,38 +74,9 @@ Gdata$stream <- factor(Gdata$Location)
 levels(Gdata$stream) <- 1:length(levels(Gdata$stream))
 Gdata$stream <- as.numeric(Gdata$stream)
 
-names(Gdata)
 
-# df = rbind(Gdata[,c("sp", "KG", "NK", "NG","SL1_mm", "mass1_gr")], Kdata[,c("sp", "KG", "NK", "NG","SL1_mm", "mass1_gr")])
-# 
-# df$Pool= factor(paste(df$NK, df$NG, sep = "-"))
-# levels(df$Pool) 
-# levels(df$Pool) = c("KG", "NG", "NK")
-# 
-# df$Poolsp = factor(paste(df$sp, df$Pool, sep= "-"))
-# 
-# df$z = log10(df$SL1_mm)
-# df$w = log10(df$mass1_gr)
-# library(ggpubr)
-# # Grouped Scatter plot with marginal density plots
-# ggscatterhist(
-#   df, x = "z", y = "w",
-#   color = "Pool", size = 2, alpha = 1,
-#   shape = "sp",
-#   palette = c("#00AFBB", "#E7B800", "#FC4E07"),
-#   margin.params = list(fill = "Pool", color = "black", size = 0.2)
-# )
 
-df= Gdata[which(Gdata$Repr ==1),]
-
-library(brms)
-glimmer(Recr ~ z * NK + (1|stream), family = , df )
-
-summary(m1)
-conditional_effects(m1, effects = "z:NK")
-
-brms::stancode(m1)
-?rethinking
+# Collect the data for the stan model -------------------------------------
 
 data_stan = list(
   # variables size 
@@ -109,74 +92,61 @@ data_stan = list(
   
   N_stream =  length(unique(Gdata$stream)),
   
-  #Response variables
+
+# Guppy: survival data ----------------------------------------------------
+
   Surv_G = Gdata$surv,
   z_survG = Gdata$z,
   NK_survG = Gdata$NK,
   stream_survG = Gdata$stream,
-  area_survG = Gdata$area,
   canopy_survG = Gdata$canopy,
   
   z1_G   = Gdata$z1[which(Gdata$surv ==1)],
   z_growG = Gdata$z[which(Gdata$surv ==1)],
   NK_growG = Gdata$NK[which(Gdata$surv ==1)],
   stream_growG = Gdata$stream[which(Gdata$surv ==1)],
-  area_growG = Gdata$area[which(Gdata$surv ==1)],
   canopy_growG = Gdata$canopy[which(Gdata$surv ==1)],
   
-  
-  Repr_G = Gdata$Repr[which(Gdata$surv ==1)],
-  z_repG = Gdata$z[which(Gdata$surv ==1)],
-  NK_repG = Gdata$NK[which(Gdata$surv ==1)],
-  stream_repG = Gdata$stream[which(Gdata$surv ==1)],
-  area_repG = Gdata$area[which(Gdata$surv ==1)],
-  canopy_repG = Gdata$canopy[which(Gdata$surv ==1)],
-  
-  
+
+# Guppy: Reproduction data ------------------------------------------------
+
   Recr_G = Gdata$Recr[which(Gdata$Repr ==1)],
   z_recrG = Gdata$z[which(Gdata$Repr ==1)],
   NK_recrG = Gdata$NK[which(Gdata$Repr ==1)],
   stream_recrG = Gdata$stream[which(Gdata$Repr ==1)],
-  area_recrG = Gdata$area[which(Gdata$Repr ==1)],
   canopy_recrG = Gdata$canopy[which(Gdata$Repr ==1)],
-  
-  
+
+
+# Killifish: survival data ------------------------------------------------
+
   Surv_K = Kdata$surv,
   z_survK = Kdata$z,
   NG_survK = Kdata$NG,
   stream_survK = Kdata$stream,
-  area_survK = Kdata$area,
   canopy_survK = Kdata$canopy,
-  
-  
+
+
+# Killifish: growth data --------------------------------------------------
+
+
   z1_K   = Kdata$z1[which(Kdata$surv ==1)],
   z_growK = Kdata$z[which(Kdata$surv ==1)],
   NG_growK = Kdata$NG[which(Kdata$surv ==1)],
   stream_growK = Kdata$stream[which(Kdata$surv ==1)],
-  area_growK = Kdata$area[which(Kdata$surv ==1)],
   canopy_growK = Kdata$canopy[which(Kdata$surv ==1)],
-  z_gK = log(Kdata$z[which(Kdata$surv ==1)] + 18) - log(18),
-  z1_gK = log(Kdata$z1[which(Kdata$surv ==1)]) - log(18),
+  z_gK = log(Kdata$z[which(Kdata$surv ==1)] + center) - log(center),
+  z1_gK = log(Kdata$z1[which(Kdata$surv ==1)]) - log(center),
   
-  
-  Repr_K = Kdata$Repr[which(Kdata$surv ==1)],
-  z_repK = Kdata$z[which(Kdata$surv ==1)],
-  NG_repK = Kdata$NG[which(Kdata$surv ==1)],
-  stream_repK = Kdata$stream[which(Kdata$surv ==1)],
-  area_repK = Kdata$area[which(Kdata$surv ==1)],
-  canopy_repK = Kdata$canopy[which(Kdata$surv ==1)],
-  
-  
+
+# Killifish: Reproduction data --------------------------------------------
+
   
   Recr_K = Kdata$Recr[which(Kdata$Repr ==1)],
   z_recrK = Kdata$z[which(Kdata$Repr ==1)],
   NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
   stream_recrK = Kdata$stream[which(Kdata$Repr ==1)],
-  area_recrK = Kdata$area[which(Kdata$Repr ==1)],
   canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)] 
 
-  
-  
 )
 # 
 

@@ -16,7 +16,7 @@ data{
   real  z_survG[N_survG];
   real  NK_survG[N_survG];
   int  stream_survG[N_survG];
- // real  area_survG[N_survG];
+  // real  area_survG[N_survG];
   real  canopy_survG[N_survG];
   
   
@@ -84,9 +84,9 @@ transformed data{
   real  z2k[N_growK];
   
   for(i in 1:N_growK){
-      z2k[i] = (18 + z_growK[i])^2 - (18^2);
+    z2k[i] = (18 + z_growK[i])^2 - (18^2);
   }
-
+  
   
 }
 
@@ -94,9 +94,9 @@ parameters{
   
   // surv guppies 
   real Intercept_survG;
- // real<lower=1.33, upper=4.86>  Intercept_survG;
+  // real<lower=1.33, upper=4.86>  Intercept_survG;
   real b_NK_survG;
-//  real<lower=0.04, upper=0.28> b_z_survG;
+  //  real<lower=0.04, upper=0.28> b_z_survG;
   real b_z_survG;
   real b_zNK_survG;
   real b_area_survG;
@@ -107,7 +107,7 @@ parameters{
   
   
   // growth guppy
-//  real<lower= (18+2.83), upper= (18+3.62)> Intercept_growG;
+  //  real<lower= (18+2.83), upper= (18+3.62)> Intercept_growG;
   real Intercept_growG;
   real b_NK_growG;
   real b_z_growG;
@@ -117,17 +117,6 @@ parameters{
   real<lower=0> sigma_growG;
   real b_area_growG;
   real b_canopy_growG;
-  
-  
-  
-  // Reproduction
-  
-  // real Intercept_repG;
-  // real b_NK_repG;
-  // real b_z_repG;
-  // real b_zNK_repG;
-  // vector[N_stream] v_Intercept_repG;
-  //real<lower=0> sigma_stream_repG;
   
   // recruitment
   
@@ -155,7 +144,7 @@ parameters{
   
   
   // growth 
-//  real<lower= (18 + 4.2), upper= (18 + 6.93)> Intercept_growK;
+  //  real<lower= (18 + 4.2), upper= (18 + 6.93)> Intercept_growK;
   real Intercept_growK;
   real b_NG_growK;
   real b_z_growK;
@@ -169,7 +158,7 @@ parameters{
   
   
   
-
+  
   real<lower=-1.76, upper= 0.71> Intercept_recrK;
   real b_NG_recrK;
   real b_z_recrK;
@@ -178,7 +167,7 @@ parameters{
   //real<lower=0> sigma_stream_recrK;
   real b_area_recrK;
   real b_canopy_recrK;
- 
+  
   
   
 }
@@ -188,13 +177,9 @@ model{
   
   vector[N_survG] p_survG;
   vector[N_growG] mu_growG;
-  //  vector[N_repG] p_repG;
   vector[N_recrG] lambda_G;
-  
-  
   vector[N_survK] p_survK;
   vector[N_growK] mu_growK;
-  //  vector[N_repK] p_repK;
   vector[N_recrK] lambda_K;
   
   // Survival
@@ -206,12 +191,12 @@ model{
   b_NK_survG ~ normal( 0 , 1 );
   Intercept_survG ~ normal( 2.6 , 3 ); //  
   // I use priors from Bassar 2017 evolution
-
+  
   
   for ( i in 1:N_survG ) {
     p_survG[i] = Intercept_survG + b_NK_survG * NK_survG[i] + b_z_survG * z_survG[i] + 
     b_zNK_survG* NK_survG[i] * z_survG[i] + v_Intercept_survG[stream_survG[i]] + 
-    b_area_survG * area_survG[i] + b_canopy_survG * canopy_survG[i];
+    b_canopy_survG * canopy_survG[i];
     p_survG[i] = inv_logit(p_survG[i]);
   }
   Surv_G ~ binomial( 1 , p_survG);
@@ -230,82 +215,82 @@ model{
     mu_growG[i] = Intercept_growG + b_NK_growG * NK_growG[i] + 
     b_z_growG * z_growG[i] + b_zNK_growG * NK_growG[i] * z_growG[i] + 
     v_Intercept_growG[stream_growG[i]]+ 
-    b_area_growG * area_growG[i] + b_canopy_growG * canopy_growG[i];
+    b_canopy_growG * canopy_growG[i];
   }
   z1_G ~ normal( mu_growG , sigma_growG );
   
   
   // Reproduction
- 
-    v_Intercept_recrG ~ normal( 0 , sigma_stream_G );
-    b_zNK_recrG ~ normal( 0 , 1 );
-    b_z_recrG ~ normal( 0 , 1 );
-    b_NK_recrG ~ normal( 0 , 1 );
-    Intercept_recrG ~ normal( 0 , 1 );
-    for ( i in 1:N_recrG ) {
-      lambda_G[i] = Intercept_recrG + b_NK_recrG * NK_recrG[i] + b_z_recrG * z_recrG[i] + 
-      b_zNK_recrG * NK_recrG[i] * z_recrG[i] + 
-      v_Intercept_recrG[stream_recrG[i]] + 
-      b_area_recrG * area_recrG[i] + b_canopy_recrG * canopy_recrG[i];
-    }
+  
+  v_Intercept_recrG ~ normal( 0 , sigma_stream_G );
+  b_zNK_recrG ~ normal( 0 , 1 );
+  b_z_recrG ~ normal( 0 , 1 );
+  b_NK_recrG ~ normal( 0 , 1 );
+  Intercept_recrG ~ normal( 0 , 1 );
+  for ( i in 1:N_recrG ) {
+    lambda_G[i] = Intercept_recrG + b_NK_recrG * NK_recrG[i] + b_z_recrG * z_recrG[i] + 
+    b_zNK_recrG * NK_recrG[i] * z_recrG[i] + 
+    v_Intercept_recrG[stream_recrG[i]] + 
+    b_canopy_recrG * canopy_recrG[i];
+  }
+  
+  Recr_G ~ poisson_log(lambda_G);  
+  
+  
+  
+  // Killifish
+  
+  // Survival
+  
+  sigma_stream_K ~ cauchy( 0 , 2 );
+  v_Intercept_survK ~ normal( 0 , sigma_stream_K );
+  b_zNG_survK ~ normal( 0 , 1 );
+  b_z_survK ~ normal( 0 , 1 );
+  b_NG_survK ~ normal( 0 , 1 );
+  Intercept_survK ~ normal( 2, 2 ); // killifish survival is atleast that of guppies
+  
+  for ( i in 1:N_survK ) {
+    p_survK[i] = Intercept_survK + b_NG_survK * NG_survK[i] + b_z_survK * z_survK[i] + 
+    b_zNG_survK* NG_survK[i] * z_survK[i] + v_Intercept_survK[stream_survK[i]] + 
+    b_canopy_survK * canopy_survK[i];
     
-    Recr_G ~ poisson_log(lambda_G);  
- 
-    
-    
-    // Killifish
-    
-    // Survival
-    
-    sigma_stream_K ~ cauchy( 0 , 2 );
-    v_Intercept_survK ~ normal( 0 , sigma_stream_K );
-    b_zNG_survK ~ normal( 0 , 1 );
-    b_z_survK ~ normal( 0 , 1 );
-    b_NG_survK ~ normal( 0 , 1 );
-    Intercept_survK ~ normal( 2, 2 ); // killifish survival is atleast that of guppies
-    
-    for ( i in 1:N_survK ) {
-      p_survK[i] = Intercept_survK + b_NG_survK * NG_survK[i] + b_z_survK * z_survK[i] + 
-      b_zNG_survK* NG_survK[i] * z_survK[i] + v_Intercept_survK[stream_survK[i]] + 
-      b_area_survK * area_survK[i] + b_canopy_survK * canopy_survK[i];
-      
-      p_survK[i] = inv_logit(p_survK[i]);
-    }
-    Surv_K ~ binomial( 1 , p_survK);
-    
-    // Krowth
-    
-    sigma_growK ~ cauchy( 0 , 1 );
-    //sigma_stream_growK ~ cauchy( 0 , 2 );
-    v_Intercept_growK ~ normal( 0 , sigma_stream_K );
-    b_zNG_growK ~ normal( 0 , 1 );
-    b_z_growK ~ normal( 0 , 1 );
-    b_NG_growK ~ normal( 0 , 1 );
-    Intercept_growK ~ normal( 18 , 10 );
-    
-    for ( i in 1:N_growK ) {
-      mu_growK[i] = Intercept_growK + b_NG_growK * NG_growK[i] + 
-      b_z_growK * z_growK[i] +  b_zNG_growK * NG_growK[i] * z_growK[i] + 
-      v_Intercept_growK[stream_growK[i]] + 
-      b_area_growK * area_growK[i] + b_canopy_growK * canopy_growK[i];
-    }
-    z1_K ~ normal( mu_growK , sigma_growK );
-    
-    
-    // Reproduction
-    
-     v_Intercept_recrK ~ normal( 0 , sigma_stream_K );
-      b_zNG_recrK ~ normal( 0 , 1 );
-      b_z_recrK ~ normal( 0 , 1 );
-      b_NG_recrK ~ normal( 0 , 1 );
-      Intercept_recrK ~ normal( 0 , 2 );
-      for ( i in 1:N_recrK ) {
-        lambda_K[i] = Intercept_recrK + b_NG_recrK * NG_recrK[i] + b_z_recrK * z_recrK[i] + 
-        b_zNG_recrK * NG_recrK[i] * z_recrK[i] + 
-        v_Intercept_recrK[stream_recrK[i]] + 
-        b_area_recrK * area_recrK[i] + b_canopy_recrK * canopy_recrK[i];
-      }
-      
-      Recr_K ~ poisson_log(lambda_K);
-      
+    p_survK[i] = inv_logit(p_survK[i]);
+  }
+  Surv_K ~ binomial( 1 , p_survK);
+  
+  // Krowth
+  
+  sigma_growK ~ cauchy( 0 , 1 );
+  //sigma_stream_growK ~ cauchy( 0 , 2 );
+  v_Intercept_growK ~ normal( 0 , sigma_stream_K );
+  b_zNG_growK ~ normal( 0 , 1 );
+  b_z_growK ~ normal( 0 , 1 );
+  b_NG_growK ~ normal( 0 , 1 );
+  Intercept_growK ~ normal( 18 , 10 );
+  
+  for ( i in 1:N_growK ) {
+    mu_growK[i] = Intercept_growK + b_NG_growK * NG_growK[i] + 
+    b_z_growK * z_growK[i] +  b_zNG_growK * NG_growK[i] * z_growK[i] + 
+    v_Intercept_growK[stream_growK[i]] + 
+    b_canopy_growK * canopy_growK[i];
+  }
+  z1_K ~ normal( mu_growK , sigma_growK );
+  
+  
+  // Reproduction
+  
+  v_Intercept_recrK ~ normal( 0 , sigma_stream_K );
+  b_zNG_recrK ~ normal( 0 , 1 );
+  b_z_recrK ~ normal( 0 , 1 );
+  b_NG_recrK ~ normal( 0 , 1 );
+  Intercept_recrK ~ normal( 0 , 2 );
+  for ( i in 1:N_recrK ) {
+    lambda_K[i] = Intercept_recrK + b_NG_recrK * NG_recrK[i] + b_z_recrK * z_recrK[i] + 
+    b_zNG_recrK * NG_recrK[i] * z_recrK[i] + 
+    v_Intercept_recrK[stream_recrK[i]] + 
+    b_canopy_recrK * canopy_recrK[i];
+  }
+  
+  Recr_K ~ poisson_log(lambda_K);
+  
 }
