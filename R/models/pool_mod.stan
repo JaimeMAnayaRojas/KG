@@ -16,42 +16,32 @@ data{
   real  z_survG[N_survG];
   real  NK_survG[N_survG];
   int  stream_survG[N_survG];
-  // real  area_survG[N_survG];
   real  canopy_survG[N_survG];
-  
+  real BiomassK_survG[N_survG];
   
   real  z1_G[N_growG];
   real  z_growG[N_growG];
   real  NK_growG[N_growG];
   int  stream_growG[N_growG];
-  // real  area_growG[N_growG];
   real  canopy_growG[N_growG];
+  real BiomassK_growG[N_growG];
   
-  
-  
-  
-  int  Repr_G[N_repG];
-  real  z_repG[N_repG];
-  real  NK_repG[N_repG];
-  int  stream_repG[N_repG];
-  // real  area_repG[N_repG];
-  real  canopy_repG[N_repG];
   
   
   int  Recr_G[N_recrG];
   real  z_recrG[N_recrG];
   real  NK_recrG[N_recrG];
   int  stream_recrG[N_recrG];
-  // real  area_recrG[N_recrG];
   real  canopy_recrG[N_recrG];
+  real BiomassK_recrG[N_recrG];
   
   
   int  Surv_K[N_survK];
   real  z_survK[N_survK];
   real  NG_survK[N_survK];
   int  stream_survK[N_survK];
-  // real  area_survK[N_survK];
   real  canopy_survK[N_survK];
+  real BiomassK_survK[N_survK];
   
   
   
@@ -59,7 +49,7 @@ data{
   real  z_growK[N_growK];
   real  NG_growK[N_growK];
   int  stream_growK[N_growK];
-  // real  area_growK[N_growK];
+  real  BiomassK_growK[N_growK];
   real  canopy_growK[N_growK];
   
   
@@ -67,26 +57,31 @@ data{
   real  z_repK[N_repK];
   real  NG_repK[N_repK];
   int  stream_repK[N_repK];
-  // real  area_repK[N_repK];
+  real  BiomassK_repK[N_repK];
   real  canopy_repK[N_repK];
   
   int  Recr_K[N_recrK];
   real  z_recrK[N_recrK];
   real  NG_recrK[N_recrK];
   int  stream_recrK[N_recrK];
-  // real  area_recrK[N_recrK];
+  real  BiomassK_recrK[N_recrK];
   real  canopy_recrK[N_recrK];
   
 }
 
 transformed data{
   
-  real  z2k[N_growK];
+  real  grow_G[N_growG];
+  real  grow_K[N_growK];
   
-  for(i in 1:N_growK){
-    z2k[i] = (18 + z_growK[i])^2 - (18^2);
+  for(i in 1:N_growG){
+    grow_G[i] = log(z1_G[i]/z_growG[i]);
   }
   
+  for(i in 1:N_growK){
+    grow_K[i] = log(z1_K[i]/z_growG[i]);
+  }
+
   
 }
 

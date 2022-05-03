@@ -74,12 +74,16 @@ Gdata$stream <- factor(Gdata$Location)
 levels(Gdata$stream) <- 1:length(levels(Gdata$stream))
 Gdata$stream <- as.numeric(Gdata$stream)
 
-
+Gdata$growth = log(Gdata$SL2_mm/Gdata$SL1_mm)
+Kdata$growth = log(Kdata$SL2_mm/Kdata$SL1_mm)
 
 # Collect the data for the stan model -------------------------------------
 
 data_stan = list(
-  # variables size 
+  
+  
+  # size of the variables (n) -----------------------------------------------
+  
   N_survG = length(Gdata$surv),
   N_growG = length(which(Gdata$surv ==1)),
   N_repG = length(which(Gdata$surv ==1)),
@@ -92,73 +96,80 @@ data_stan = list(
   
   N_stream =  length(unique(Gdata$stream)),
   
-
-# Guppy: survival data ----------------------------------------------------
-
+  
+  # Guppy: survival data ----------------------------------------------------
+  
   Surv_G = Gdata$surv,
   z_survG = Gdata$z,
   NK_survG = Gdata$NK,
   stream_survG = Gdata$stream,
   canopy_survG = Gdata$canopy,
+  BiomassK_survG = Gdata$BiomassK,
   
+
+  # Guppy: growth -----------------------------------------------------------
   z1_G   = Gdata$z1[which(Gdata$surv ==1)],
   z_growG = Gdata$z[which(Gdata$surv ==1)],
   NK_growG = Gdata$NK[which(Gdata$surv ==1)],
   stream_growG = Gdata$stream[which(Gdata$surv ==1)],
   canopy_growG = Gdata$canopy[which(Gdata$surv ==1)],
+  Biomass_growG = Gdata$BiomassK[which(Gdata$surv ==1)],
+   
   
-
-# Guppy: Reproduction data ------------------------------------------------
-
+  
+  # Guppy: Reproduction data ------------------------------------------------
+  
   Recr_G = Gdata$Recr[which(Gdata$Repr ==1)],
   z_recrG = Gdata$z[which(Gdata$Repr ==1)],
   NK_recrG = Gdata$NK[which(Gdata$Repr ==1)],
   stream_recrG = Gdata$stream[which(Gdata$Repr ==1)],
   canopy_recrG = Gdata$canopy[which(Gdata$Repr ==1)],
-
-
-# Killifish: survival data ------------------------------------------------
-
+  BiomassK_recrG = Gdata$BiomassK[which(Gdata$Repr ==1)],
+  
+  
+  # Killifish: survival data ------------------------------------------------
+  
   Surv_K = Kdata$surv,
   z_survK = Kdata$z,
   NG_survK = Kdata$NG,
   stream_survK = Kdata$stream,
   canopy_survK = Kdata$canopy,
-
-
-# Killifish: growth data --------------------------------------------------
-
-
+  BiomassK_survK = Kdata$BiomassK,
+  
+  
+  # Killifish: growth data --------------------------------------------------
+  
+  
   z1_K   = Kdata$z1[which(Kdata$surv ==1)],
   z_growK = Kdata$z[which(Kdata$surv ==1)],
   NG_growK = Kdata$NG[which(Kdata$surv ==1)],
   stream_growK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_growK = Kdata$canopy[which(Kdata$surv ==1)],
-  z_gK = log(Kdata$z[which(Kdata$surv ==1)] + center) - log(center),
-  z1_gK = log(Kdata$z1[which(Kdata$surv ==1)]) - log(center),
+  BiomassK_growK = Kdata$BiomassK[which(Kdata$surv ==1)],
   
-
-# Killifish: Reproduction data --------------------------------------------
-
+  
+  
+  # Killifish: Reproduction data --------------------------------------------
+  
   
   Recr_K = Kdata$Recr[which(Kdata$Repr ==1)],
   z_recrK = Kdata$z[which(Kdata$Repr ==1)],
   NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
   stream_recrK = Kdata$stream[which(Kdata$Repr ==1)],
-  canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)] 
-
+  canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)],
+  BiomassK_recrK = Kdata$BiomassK[which(Kdata$Repr ==1)]
 )
 # 
 
- modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4, 
-                 iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
- saveRDS(modG, "outputs/Model_KG.RDS")
- 
+modG = stan("R/models/pool_mod.stan", data = data_stan, cores = 4, chains = 4, 
+            iter = 6000, warmup = 4500, control = list(adapt_delta = 0.92, max_treedepth = 12))
+saveRDS(modG, "outputs/Model_KG.RDS")
 
- modG = readRDS("outputs/Model_KG.RDS")
- sum = as.data.frame(precis(modG, digits = 5, prob = .95, depth = 2))
- sum$Pars = rownames(sum)
- 
+
+modG = readRDS("outputs/Model_KG.RDS")
+sum = as.data.frame(precis(modG, digits = 5, prob = .95, depth = 2))
+sum$Pars = rownames(sum)
+
 precis(modG, digits = 5, prob = .95, depth = 2)
 
 
