@@ -61,7 +61,7 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	# min_size = 4
 	# max_size = 35
 	# size_cen = 18.0
-	# area = 0.0
+	# BiomassK = 0.0
 	# canopy =0.0
 
 	U= Float64(max_size)
@@ -76,18 +76,18 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	pars_KG_G = select(post,
     	:Intercept_survG => :"α_surv",
     	:b_z_survG => :"βz_surv",
-    	:b_area_survG => :"β_area_surv",
+    	:b_BiomassK_survG => :"β_BiomassK_surv",
     	:b_canopy_survG => :"β_canopy_surv",
 
     	:Intercept_growG => :"α_grow",
     	:b_z_growG => :"βz_grow",
-    	:b_area_growG => :"β_area_grow",
+    	:b_BiomassK_growG => :"β_BiomassK_grow",
     	:b_canopy_growG => :"β_canopy_grow",
 		:sigma_growG => :σ_grow,
 
     	:Intercept_recrG => :"α_fec",
     	:b_z_recrG => :"βz_fec",
-    	:b_area_recrG => :"β_area_fec",
+    	:b_BiomassK_recrG => :"β_BiomassK_fec",
     	:b_canopy_recrG => :"β_canopy_fec"
 	)		
 
@@ -95,18 +95,18 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	pars_NK_G = select(post,
 		:Intercept_survG => :"α_surv",
 		:b_z_survG => :"βz_surv",
-		:b_area_survG => :"β_area_surv",
+		:b_BiomassK_survG => :"β_BiomassK_surv",
 		:b_canopy_survG => :"β_canopy_surv",
 
 		:Intercept_growG => :"α_grow",
 		:b_z_growG => :"βz_grow",
-		:b_area_growG => :"β_area_grow",
+		:b_BiomassK_growG => :"β_BiomassK_grow",
 		:b_canopy_growG => :"β_canopy_grow",
 		:sigma_growG => :σ_grow,
 
 		:Intercept_recrG => :"α_fec",
 		:b_z_recrG => :"βz_fec",
-		:b_area_recrG => :"β_area_fec",
+		:b_BiomassK_recrG => :"β_BiomassK_fec",
 		:b_canopy_recrG => :"β_canopy_fec"
 
 
@@ -370,10 +370,12 @@ end
 function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110, 
     size_cen = 18.0)
       
+	# size_cen = 18.0
     # nBigMatrix = 100
     # min_size = 2.0
-    # max_size = 110.0
-    U= max_size
+    # max_size = 120
+
+	U= max_size
     L= min_size
     m = nBigMatrix
     h = (U - L)/m
@@ -383,50 +385,48 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     z = z1
     meshpts = z1
   
-    size_cen = (18.0)
   
     # Get the parameters
   
-    first(post,6)
-    post.sigma_growK
+
     pars_GR_K = select(post,
-        :Intercept_survK => :"α_surv",
+		:Intercept_survK => :"α_surv",
         :b_z_survK => :"βz_surv",
-        :b_area_survK => :"β_area_surv",
+        :b_BiomassK_survK => :"β_BiomassK_surv",
         :b_canopy_survK => :"β_canopy_surv",
   
         :Intercept_growK => :"α_grow",
         :b_z_growK => :"βz_grow",
-        :b_area_growK => :"β_area_grow",
+		:b_z2_growK => :"βz2_grow",
+        :b_BiomassK_growK => :"β_BiomassK_grow",
         :b_canopy_growK => :"β_canopy_grow",
         :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
   
         :Intercept_recrK => :"α_fec",
         :b_z_recrK => :"βz_fec",
-        :b_area_recrK => :"β_area_fec",
+        :b_BiomassK_recrK => :"β_BiomassK_fec",
         :b_canopy_recrK => :"β_canopy_fec"
-  
-  
-    )
+	)
   
   
   
     pars_NG_K = select(post,
         :Intercept_survK => :"α_surv",
         :b_z_survK => :"βz_surv",
-        :b_area_survK => :"β_area_surv",
+        :b_BiomassK_survK => :"β_BiomassK_surv",
         :b_canopy_survK => :"β_canopy_surv",
   
         :Intercept_growK => :"α_grow",
         :b_z_growK => :"βz_grow",
+		:b_z2_growK => :"βz2_grow",
        
-        :b_area_growK => :"β_area_grow",
+        :b_BiomassK_growK => :"β_BiomassK_grow",
         :b_canopy_growK => :"β_canopy_grow",
         :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
   
         :Intercept_recrK => :"α_fec",
         :b_z_recrK => :"βz_fec",
-        :b_area_recrK => :"β_area_fec",
+        :b_BiomassK_recrK => :"β_BiomassK_fec",
         :b_canopy_recrK => :"β_canopy_fec"
     )
   
@@ -442,12 +442,16 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
   
   
     function g_z1zK(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
-      α= df.α_grow[row]
+      z2 = z .* z .- size_cen*size_cen  
+	  zc = z .- size_cen 
+		
+	  α= df.α_grow[row]
       β= df.βz_grow[row]
+	  β2= df.βz2_grow[row]
      
       σ= df.σ_grow[row]
       p_den_grow = zeros(size(z)[1],size(z)[1])
-      μ = ((α .+ β .* (z .- size_cen ) .- (z))./2 .+ z) # average growth in two weeks
+      μ = (((α .+ β .* zc .+ β2 .* z2) .- z)./2) .+ z # average growth in two weeks
       #μ = round.(μ, digits = 10)
       
       for i in 1:nBigMatrix
@@ -461,9 +465,11 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     end
   
   
-    #@time g = g_z1zK(pars_GR_K, z1, z, size_cen, row)
+    @time g = g_z1zK(pars_GR_K, z1, z, size_cen, 1)
   
   
+	sum.(eachcol(g)) 
+
     ## Surival function
   
   
@@ -669,4 +675,4 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     end
     return [Kres_IPM, Ksurv_mat, Kgrow_mat, Kfec_mat, Krcz_mat]
   
-  end
+end

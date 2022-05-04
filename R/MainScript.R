@@ -170,6 +170,7 @@ modG = readRDS("outputs/Model_KG.RDS")
 sum = as.data.frame(precis(modG, digits = 5, prob = .95, depth = 2))
 sum$Pars = rownames(sum)
 
+
 precis(modG, digits = 5, prob = .95, depth = 2)
 
 
@@ -184,16 +185,20 @@ write.csv(as.data.frame(post), "outputs/Posteriors.csv")
 
 PP = as.vector(apply(as.data.frame(post), 2, LOS))
 
-model.summary <- as.data.frame(precis(modG, prob = .95, digits = 3, depth = 2))
+PP
 
-model.summary$LOS_l = PP[-65]
-model.summary$LOS_u = 100- PP[-65]
+names(post)
+model.summary <- as.data.frame(precis(modG, prob = .95, digits = 3, depth = 3))
+
+model.summary$LOS_l = PP[-which(names(post) == "lp__")]
+model.summary$LOS_u = 100 - model.summary$LOS_l
 model.summary[model.summary$`2.5%` > 0,]
 model.summary[model.summary$`97.5%` < 0,] 
 model.summary[model.summary$`2.5%` > 0,] 
 
 model.summary
 
-model.summary[model.summary$LOS_l > 90,] 
-model.summary[model.summary$LOS_l < 10,] 
+model.summary[model.summary$LOS_l > 95,] 
+model.summary[model.summary$LOS_l < 5,] 
+
 write.csv(model.summary, "outputs/Model_sum.csv")
