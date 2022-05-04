@@ -113,7 +113,7 @@ data_stan = list(
   NK_growG = Gdata$NK[which(Gdata$surv ==1)],
   stream_growG = Gdata$stream[which(Gdata$surv ==1)],
   canopy_growG = Gdata$canopy[which(Gdata$surv ==1)],
-  Biomass_growG = Gdata$BiomassK[which(Gdata$surv ==1)],
+  BiomassK_growG = Gdata$BiomassK[which(Gdata$surv ==1)],
    
   
   
