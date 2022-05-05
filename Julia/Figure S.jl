@@ -53,18 +53,18 @@ z1k =  2 .+ (collect(1:m) .- 0.5) .* ((110 - 2)/m)
 pars_GR_G = select(post,
 :Intercept_survG => :"α_surv",
 :b_z_survG => :"βz_surv",
-:b_BiomassK_survG => :"β_BiomassK_surv",
+
 :b_canopy_survG => :"β_canopy_surv",
 
 :Intercept_growG => :"α_grow",
 :b_z_growG => :"βz_grow",
-:b_BiomassK_growG => :"β_BiomassK_grow",
+
 :b_canopy_growG => :"β_canopy_grow",
 :sigma_growG => :σ_grow,
 
 :Intercept_recrG => :"α_fec",
 :b_z_recrG => :"βz_fec",
-:b_BiomassK_recrG => :"β_BiomassK_fec",
+
 :b_canopy_recrG => :"β_canopy_fec"
 )		
 
@@ -72,12 +72,12 @@ pars_GR_G = select(post,
 pars_NR_G = select(post,
 :Intercept_survG => :"α_surv",
 :b_z_survG => :"βz_surv",
-:b_BiomassK_survG => :"β_BiomassK_surv",
+
 :b_canopy_survG => :"β_canopy_surv",
 
 :Intercept_growG => :"α_grow",
 :b_z_growG => :"βz_grow",
-:b_BiomassK_growG => :"β_BiomassK_grow",
+
 :b_canopy_growG => :"β_canopy_grow",
 :sigma_growG => :σ_grow,
 
@@ -103,19 +103,19 @@ println(names(post))
 pars_GR_K = select(post,
 :Intercept_survK => :"α_surv",
 :b_z_survK => :"βz_surv",
-:b_BiomassK_survK => :"β_BiomassK_surv",
+
 :b_canopy_survK => :"β_canopy_surv",
 
 :Intercept_growK => :"α_grow",
 :b_z_growK => :"βz_grow",
 :b_z2_growK => :"βz2_grow",
-:b_BiomassK_growK => :"β_BiomassK_grow",
+
 :b_canopy_growK => :"β_canopy_grow",
 :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
 
 :Intercept_recrK => :"α_fec",
 :b_z_recrK => :"βz_fec",
-:b_BiomassK_recrK => :"β_BiomassK_fec",
+
 :b_canopy_recrK => :"β_canopy_fec"
 
 
@@ -126,20 +126,20 @@ pars_GR_K = select(post,
 pars_NG_K = select(post,
 :Intercept_survK => :"α_surv",
 :b_z_survK => :"βz_surv",
-:b_BiomassK_survK => :"β_BiomassK_surv",
+
 :b_canopy_survK => :"β_canopy_surv",
 
 :Intercept_growK => :"α_grow",
 :b_z_growK => :"βz_grow",
 :b_z2_growK => :"βz2_grow",
 
-:b_BiomassK_growK => :"β_BiomassK_grow",
+
 :b_canopy_growK => :"β_canopy_grow",
 :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
 
 :Intercept_recrK => :"α_fec",
 :b_z_recrK => :"βz_fec",
-:b_BiomassK_recrK => :"β_BiomassK_fec",
+
 :b_canopy_recrK => :"β_canopy_fec"
 )
 
