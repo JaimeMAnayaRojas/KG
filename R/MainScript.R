@@ -46,8 +46,6 @@ Kdata <- Kdata[-which(Kdata$Sex2=="M"),]
 Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
 
 
-Gdata[,c("BiomassG1", "BiomassG2","BiomassK1","BiomassK2", "G1s", "K1s", "G2s", "K2s" )]
-
 
 # Normalize the covariates (killifish biomass and canopy) -----------------
 
