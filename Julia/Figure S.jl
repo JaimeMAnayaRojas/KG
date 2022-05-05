@@ -99,6 +99,7 @@ pars_NR_G.βz_fec = pars_NR_G.βz_fec .+ post.b_zNK_recrG
 
 ## Killifish
 
+println(names(post))
 pars_GR_K = select(post,
 :Intercept_survK => :"α_surv",
 :b_z_survK => :"βz_surv",
@@ -107,6 +108,7 @@ pars_GR_K = select(post,
 
 :Intercept_growK => :"α_grow",
 :b_z_growK => :"βz_grow",
+:b_z2_growK => :"βz2_grow",
 :b_BiomassK_growK => :"β_BiomassK_grow",
 :b_canopy_growK => :"β_canopy_grow",
 :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
@@ -129,6 +131,7 @@ pars_NG_K = select(post,
 
 :Intercept_growK => :"α_grow",
 :b_z_growK => :"βz_grow",
+:b_z2_growK => :"βz2_grow",
 
 :b_BiomassK_growK => :"β_BiomassK_grow",
 :b_canopy_growK => :"β_canopy_grow",
@@ -250,9 +253,26 @@ scatter!(DataG.SL1_mm, DataG.SL2_mm, groups = DataG.NK, c= [:lightskyblue, :red]
 KG = zeros(size(pars_GR_K)[1], length(z))
 NG = zeros(size(pars_NG_K)[1], length(z))
 
+
+function g_z1zK2(df::AbstractDataFrame, z1::AbstractVector, z::AbstractVector, 
+    size_cen::AbstractFloat, row::Integer)
+    α= df.α_grow[row]
+    β= df.βz_grow[row]
+    β2= df.βz2_grow[row]
+    σ= df.σ_grow[row]
+
+   p_den_grow = zeros(size(z)[1],size(z)[1])
+    μ = α .+ β * (z .- size_cen ) .+ β2 * (z.^2 .- size_cen^2 ) 
+    for i in 1:nBigMatrix
+        p_den_grow[:,i] = pdf.(Normal(μ[i], σ), z1).*h
+    end
+    return(μ)
+end
+
+
 for i in 1:size(pars_NG_K)[1]
-    KG[i,:] =  sum(eachcol(g_z1z(pars_GR_K, z1k, z1k, size_cen, i)))
-    NG[i,:] =  sum(eachcol(g_z1z(pars_NG_K, z1k, z1k, size_cen, i)))
+    KG[i,:] =  sum(eachcol(g_z1zK2(pars_GR_K, z1k, z1k, size_cen, i)))
+    NG[i,:] =  sum(eachcol(g_z1zK2(pars_NG_K, z1k, z1k, size_cen, i)))
 end
 
 p = my_summary(KG)
