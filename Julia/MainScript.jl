@@ -11,8 +11,8 @@ using Plots.Measures
 
 
 # Set the working directory to my folder
-# cd("$(homedir())")
-# cd("Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
+cd("$(homedir())")
+cd("Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 pwd()
 
 # load my functions
@@ -40,16 +40,16 @@ post = CSV.read("outputs/Posteriors.csv", DataFrame)
 # In Julia the first time a function is used it takes a bit of time, after that it becomes faster and faster
 # Run both IPM models
 
-@time Guppy_IPM(post[1:3,:]; nBigMatrix = 100, min_size = 2, max_size = 45, size_cen = 18.0) # 
-@time Killifish_IPM(post[1:2,:]; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)
+# @time Guppy_IPM(post[1:3,:]; nBigMatrix = 100, min_size = 2, max_size = 45, size_cen = 18.0) # 
+# @time Killifish_IPM(post[1:2,:]; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)
 
 
- nBigMatrix = 100
-IPMs = [Guppy_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 45, size_cen = 18.0),
-Killifish_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 110, size_cen = 18.0)]
+nBigMatrix = 100
+# IPMs = [Guppy_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 45, size_cen = 18.0),
+# Killifish_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 110, size_cen = 18.0)]
 
 # ## Save the IPMs
-@save "outputs/IPMs.jld2" IPMs  
+#@save "outputs/IPMs.jld2" IPMs  
 
 ## load the IPMs
 @load "outputs/IPMs.jld2" IPMs  

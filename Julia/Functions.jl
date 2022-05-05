@@ -465,10 +465,10 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     end
   
   
-    @time g = g_z1zK(pars_GR_K, z1, z, size_cen, 1)
+    # @time g = g_z1zK(pars_GR_K, z1, z, size_cen, 1)
   
   
-	sum.(eachcol(g)) 
+	# sum.(eachcol(g)) 
 
     ## Surival function
   
