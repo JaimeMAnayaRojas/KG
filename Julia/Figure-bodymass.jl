@@ -13,6 +13,9 @@ Gz = CSV.read("data/01_GuppyField_data.csv", DataFrame)
 Kz = CSV.read( "data/01_KillifishField_data.csv", DataFrame)
 
 
+filter!(:Location => x -> x !="JOE", Gz)
+filter!(:Location => x -> x !="JOE", Kz)
+
 println(describe(Gz))
 
 replace!(Gz.Mark, missing=>"NaN")
@@ -20,6 +23,9 @@ replace!(Kz.Mark, missing=>"NaN")
 
 filter!(:Mark => x -> x !="others", Gz)
 filter!(:Mark => x -> x !="others", Kz)
+
+
+
 
 Gz.Mark = categorical(Gz.Mark)
 Kz.Mark = categorical(Kz.Mark)
@@ -32,16 +38,15 @@ replace!(Gz.mass2_gr, missing=>NaN)
 replace!(Kz.mass1_gr, missing=>NaN)
 replace!(Kz.mass2_gr, missing=>NaN)
 
+base = 1.5
 
-Gz.mass1_gr = log10.(Gz.mass1_gr)
-Gz.mass2_gr = log10.(Gz.mass2_gr)
+Gz.mass1_gr = log.(base, Gz.mass1_gr)
+Gz.mass2_gr = log.(base, Gz.mass2_gr)
 
-Kz.mass1_gr = log10.(Kz.mass1_gr)
-Kz.mass2_gr = log10.(Kz.mass2_gr)
+Kz.mass1_gr = log.(base, Kz.mass1_gr)
+Kz.mass2_gr = log.(base, Kz.mass2_gr)
 
 
-filter!(:Location => x -> x !="JOE", Gz)
-filter!(:Location => x -> x !="JOE", Kz)
 
 Gz.Location = categorical(Gz.Location)
 
@@ -53,8 +58,12 @@ p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 &&
 )
 
 length(p.mass1_gr) - length(findall(isnan.(p.mass1_gr)))
-p1a = histogram(p.mass1_gr, bins = 30, alpha=1, color = :white, label = "Before",
+p1a = histogram(p.mass1_gr, bins = 30, alpha=1, color = :white, label = "Removed",
  linewidth = 1.5, linestyle = :dot)
+
+length(p.mass2_gr) - length(findall(isnan.(p.mass2_gr)))
+histogram!(p.mass2_gr, bins = 30, alpha=0.1, color = :red, label = "Recovered",
+linewidth = 1.5, linestyle = :dash)
 
 p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
         y == "CAI" && w != "NaN", Gz
@@ -66,6 +75,7 @@ histogram!(p.mass1_gr, bins = 30, alpha=0.5, color = :orange, label = "Introduce
 p = filter([:KG, :Location, :Mark] => (x,y,w) -> x == 1 && 
         y == "CAI" && w != "NaN", Gz
 )
+
 
 length(p.mass2_gr) - length(findall(isnan.(p.mass2_gr)))
 histogram!(p.mass2_gr, bins = 30, alpha=0.7, color = :gray, label = "Recovered", legend =:topleft,

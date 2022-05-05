@@ -182,6 +182,7 @@ plot!(z, p[:,:median], ribbon = (p.median .- p.l68, p.u68 .- p.median), linewidt
 #xlabel!("Initial size (mm)")
 ylabel!("Guppy \n Survival (%)")
 ylims!((0,100))
+xlims!(5,30)
 
 ######################################################################
 
@@ -202,7 +203,7 @@ plot!(z1k, p[:,:median], ribbon = (p.median .- p.l68, p.u68 .- p.median), linewi
 xlabel!("Initial size (mm)")
 ylabel!("Killifish \n Survival (%)")
 ylims!((0,100))
-
+xlims!(5,100)
 #scatter!(z, DataG.surv.*100)
 my_summary(NK)
 
@@ -246,7 +247,8 @@ linewidth = 3, label = false)
 ylabel!("Final size \n (mm)")
 
 scatter!(DataG.SL1_mm, DataG.SL2_mm, groups = DataG.NK, c= [:lightskyblue, :red], alpha = 0.8, label =false)
-
+xlims!(5,32)
+ylims!(5,32)
 
 # Killifish
 
@@ -282,6 +284,7 @@ pS1e =plot(z1k, p[:,:median], ribbon = (p.median .- p.l68, p.u68 .- p.median),
 )
 
 
+
 p = my_summary(NG)
 plot!(z1k, p[:,:median], ribbon = (p.median .- p.l68, p.u68 .- p.median), 
 linewidth = 3, label = false)
@@ -291,6 +294,9 @@ ylabel!("Final size \n (mm)")
 
 scatter!(DataK.SL1_mm, DataK.SL2_mm, groups = DataK.NG, 
 c = [:lightskyblue, :red], alpha = 0.8, label = false)
+
+ylims!(5,100)
+xlims!(5,100)
 
 ## Fecundity
 function pr_z(df::AbstractDataFrame, z::AbstractVector, size_cen::AbstractFloat, row::Integer)
@@ -328,6 +334,7 @@ linewidth = 3, label = false)
 ylabel!("Offspring (N)")
 scatter!(DataG.SL1_mm, DataG.Recr, groups = DataG.NK, c = [:lightskyblue, :red], alpha = 0.8, label = false)
 
+xlims!(5,30)
 
 # Killifish
 
@@ -356,5 +363,5 @@ xlabel!("Initial size \n (mm)")
 scatter!(DataK.SL1_mm, DataK.Recr, groups = DataK.NG, 
 c = [:lightskyblue, :red], alpha = 0.8, label = false)
 
-
+xlims!(5,100)
 plot(pS1a, pS1b, pS1c, pS1d, pS1e,pS1f, layout = (2,3), size = (900, 600), margin = [2mm 3mm])
