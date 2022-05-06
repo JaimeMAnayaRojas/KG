@@ -227,9 +227,7 @@ model.summary$LOS_l = PP[-which(names(post) == "lp__")]
 model.summary$LOS_u = 100 - model.summary$LOS_l
 model.summary[model.summary$`2.5%` > 0,]
 model.summary[model.summary$`97.5%` < 0,] 
-model.summary[model.summary$`2.5%` > 0,] 
 
-model.summary
 
 model.summary[model.summary$LOS_l > 95,] 
 model.summary[model.summary$LOS_l < 5,] 
