@@ -18,9 +18,6 @@ pwd()
 # load my functions
 include("Functions.jl")
 
-
-
-
 # Run the Bayesian model via rstan.
 R"""
     source("R/MainScript.R")
