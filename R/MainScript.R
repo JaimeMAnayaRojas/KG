@@ -49,6 +49,20 @@ Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
 
 # Normalize the covariates (killifish biomass and canopy) -----------------
 
+Gdata$FishBiom <- Gdata$BiomassG1 + Gdata$BiomassK1
+Kdata$FishBiom <- Kdata$BiomassG1 + Kdata$BiomassK1
+
+meanC = mean(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
+sdC = sd(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
+
+
+
+Gdata$FishBiom <- (Gdata$FishBiom - meanC) /  sdC
+Kdata$FishBiom <- (Kdata$FishBiom - meanC) /  sdC
+
+
+
+
 meanC = mean(unique(c(Gdata$canopy, Kdata$canopy) ))
 sdC = sd(unique(c(Gdata$canopy, Kdata$canopy) ))
 Gdata$canopy <- (Gdata$canopy - meanC) /  sdC
@@ -102,6 +116,7 @@ data_stan = list(
   BK2_survG = Gdata$K2s,
   BG1_survG = Gdata$G1s,
   BG2_survG = Gdata$G2s,
+  FB_survG = Gdata$FishBiom,
   
 
   # Guppy: growth -----------------------------------------------------------
@@ -114,7 +129,7 @@ data_stan = list(
   BK2_growG = Gdata$K2s[which(Gdata$surv ==1)],
   BG1_growG = Gdata$G1s[which(Gdata$surv ==1)],
   BG2_growG = Gdata$G2s[which(Gdata$surv ==1)],
-  
+  FB_growG = Gdata$FishBiom[which(Gdata$surv ==1)],
   
   
   # Guppy: Reproduction data ------------------------------------------------
@@ -128,7 +143,7 @@ data_stan = list(
   BK2_recrG = Gdata$K2s[which(Gdata$Repr ==1)],
   BG1_recrG = Gdata$G1s[which(Gdata$Repr ==1)],
   BG2_recrG = Gdata$G2s[which(Gdata$Repr ==1)],
-  
+  FB_recrG = Gdata$FishBiom[which(Gdata$Repr ==1)],
   
   # Killifish: survival data ------------------------------------------------
   
@@ -141,6 +156,7 @@ data_stan = list(
   BK2_survK = Kdata$K2s,
   BG1_survK = Kdata$G1s,
   BG2_survK = Kdata$G2s,
+  FB_survK = Kdata$FishBiom,
   
   
   
@@ -152,11 +168,11 @@ data_stan = list(
   NG_growK = Kdata$NG[which(Kdata$surv ==1)],
   stream_growK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_growK = Kdata$canopy[which(Kdata$surv ==1)],
-  BK1_growK = Gdata$K1s[which(Kdata$surv ==1)],
-  BK2_growK = Gdata$K2s[which(Kdata$surv ==1)],
-  BG1_growK = Gdata$G1s[which(Kdata$surv ==1)],
-  BG2_growK = Gdata$G2s[which(Kdata$surv ==1)],
-  
+  BK1_growK = Kdata$K1s[which(Kdata$surv ==1)],
+  BK2_growK = Kdata$K2s[which(Kdata$surv ==1)],
+  BG1_growK = Kdata$G1s[which(Kdata$surv ==1)],
+  BG2_growK = Kdata$G2s[which(Kdata$surv ==1)],
+  FB_growK = Kdata$FishBiom[which(Kdata$surv ==1)],
   
   
   # Killifish: Reproduction data --------------------------------------------
@@ -167,10 +183,11 @@ data_stan = list(
   NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
   stream_recrK = Kdata$stream[which(Kdata$Repr ==1)],
   canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)],
-  BK1_recrK = Gdata$K1s[which(Kdata$Repr ==1)],
-  BK2_recrK = Gdata$K2s[which(Kdata$Repr ==1)],
-  BG1_recrK = Gdata$G1s[which(Kdata$Repr ==1)],
-  BG2_recrK = Gdata$G2s[which(Kdata$Repr ==1)]
+  BK1_recrK = Kdata$K1s[which(Kdata$Repr ==1)],
+  BK2_recrK = Kdata$K2s[which(Kdata$Repr ==1)],
+  BG1_recrK = Kdata$G1s[which(Kdata$Repr ==1)],
+  BG2_recrK = Kdata$G2s[which(Kdata$Repr ==1)],
+  FB_recrK = Kdata$FishBiom[which(Kdata$Repr ==1)]
   
 
   
