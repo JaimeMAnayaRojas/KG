@@ -112,9 +112,9 @@ parameters{
   real b_z_survG;
   real b_zNK_survG;
   real b_BK1_survG;
-  real b_BK2_survG;
+  // real b_BK2_survG;
   real b_BG1_survG;
-  real b_BG2_survG;
+  // real b_BG2_survG;
   real b_canopy_survG;
   vector[N_stream] v_Intercept_survG;
   real<lower=0> sigma_stream_G;
@@ -130,9 +130,9 @@ parameters{
   real<lower=0> sigma_growG;
   real b_canopy_growG;
   real b_BK1_growG;
-  real b_BK2_growG;
+  // real b_BK2_growG;
   real b_BG1_growG;
-  real b_BG2_growG;
+  // real b_BG2_growG;
   
   // recruitment
   
@@ -143,9 +143,9 @@ parameters{
   vector[N_stream] v_Intercept_recrG;
   real b_canopy_recrG;
   real b_BK1_recrG;  
-  real b_BK2_recrG;  
+  // real b_BK2_recrG;  
   real b_BG1_recrG;  
-  real b_BG2_recrG;  
+  // real b_BG2_recrG;  
   
   // Killifish
   
@@ -158,9 +158,9 @@ parameters{
   real<lower=0> sigma_stream_K;
   real b_canopy_survK;
   real b_BK1_survK;
-  real b_BK2_survK;
+  // real b_BK2_survK;
   real b_BG1_survK;
-  real b_BG2_survK;
+  // real b_BG2_survK;
   
   // growth 
   real Intercept_growK;
@@ -172,9 +172,9 @@ parameters{
   real<lower=0> sigma_growK;
   real b_canopy_growK;
   real b_BK1_growK;
-  real b_BK2_growK;
+  // real b_BK2_growK;
   real b_BG1_growK;
-  real b_BG2_growK;
+  // real b_BG2_growK;
   
   
   real<lower=-1.76, upper= 0.71> Intercept_recrK;
@@ -184,9 +184,9 @@ parameters{
   vector[N_stream] v_Intercept_recrK;
   real b_canopy_recrK;
   real b_BK1_recrK;  
-  real b_BK2_recrK; 
+  // real b_BK2_recrK; 
   real b_BG1_recrK; 
-  real b_BG2_recrK; 
+  // real b_BG2_recrK; 
   
 }
 
@@ -209,9 +209,9 @@ model{
   b_NK_survG ~ normal( 0 , 1 );
   Intercept_survG ~ normal( 2.6 , 3 ); //  
   b_BK1_survG ~ normal( 0 , 1 );
-  b_BK2_survG ~ normal( 0 , 1 );
+  // b_BK2_survG ~ normal( 0 , 1 );
   b_BG1_survG ~ normal( 0 , 1 );
-  b_BG2_survG ~ normal( 0 , 1 );
+  // b_BG2_survG ~ normal( 0 , 1 );
   // I use priors from Bassar 2017 evolution
   
   
@@ -219,8 +219,10 @@ model{
     p_survG[i] = Intercept_survG + b_NK_survG * NK_survG[i] + b_z_survG * z_survG[i] + 
     b_zNK_survG* NK_survG[i] * z_survG[i] + v_Intercept_survG[stream_survG[i]] + 
     b_canopy_survG * canopy_survG[i] + 
-    b_BK1_survG * BK1_survG[i] +  b_BK2_survG * BK2_survG[i] +
-    b_BG1_survG * BG1_survG[i] +  b_BG2_survG * BG2_survG[i];
+    b_BK1_survG * BK1_survG[i] +
+    // b_BK2_survG * BK2_survG[i] +
+    b_BG1_survG * BG1_survG[i];
+    // +  b_BG2_survG * BG2_survG[i];
     
     p_survG[i] = inv_logit(p_survG[i]);
   }
@@ -236,9 +238,9 @@ model{
   b_NK_growG ~ normal( 0 , 1 );
   Intercept_growG ~ normal( (18) , 10); // Bassar et al., 2017
   b_BK1_growG ~ normal( 0 , 1 );
-  b_BK2_growG ~ normal( 0 , 1 );
+  // b_BK2_growG ~ normal( 0 , 1 );
   b_BG1_growG ~ normal( 0 , 1 );
-  b_BG2_growG ~ normal( 0 , 1 );
+  // b_BG2_growG ~ normal( 0 , 1 );
   
   
   for ( i in 1:N_growG ) {
@@ -246,8 +248,10 @@ model{
     b_z_growG * z_growG[i] + b_zNK_growG * NK_growG[i] * z_growG[i] + 
     v_Intercept_growG[stream_growG[i]]+ 
     b_canopy_growG * canopy_growG[i] + 
-    b_BK1_growG*BK1_growG[i] + b_BK2_growG*BK2_growG[i] + 
-    b_BG1_growG*BG1_growG[i] + b_BG2_growG*BG2_growG[i];
+    b_BK1_growG*BK1_growG[i] + 
+    // b_BK2_growG*BK2_growG[i] + 
+    b_BG1_growG*BG1_growG[i]; 
+    // + b_BG2_growG*BG2_growG[i];
   }
   
   z1_G ~ normal( mu_growG , sigma_growG );
@@ -261,17 +265,19 @@ model{
   b_NK_recrG ~ normal( 0 , 1 );
   Intercept_recrG ~ normal( 0 , 1 );
   b_BK1_recrG ~ normal( 0 , 1 );
-  b_BK2_recrG ~ normal( 0 , 1 );
+  // b_BK2_recrG ~ normal( 0 , 1 );
   b_BG1_recrG ~ normal( 0 , 1 );
-  b_BG2_recrG ~ normal( 0 , 1 );
+  // b_BG2_recrG ~ normal( 0 , 1 );
   
   for ( i in 1:N_recrG ) {
     lambda_G[i] = Intercept_recrG + b_NK_recrG * NK_recrG[i] + b_z_recrG * z_recrG[i] + 
     b_zNK_recrG * NK_recrG[i] * z_recrG[i] + 
     v_Intercept_recrG[stream_recrG[i]] + 
     b_canopy_recrG * canopy_recrG[i] + 
-    b_BK1_recrG * BK1_recrG[i] + b_BK2_recrG * BK2_recrG[i] +
-    b_BG1_recrG * BG1_recrG[i] + b_BG2_recrG * BG2_recrG[i];
+    b_BK1_recrG * BK1_recrG[i] +
+    // b_BK2_recrG * BK2_recrG[i] +
+    b_BG1_recrG * BG1_recrG[i];
+    // + b_BG2_recrG * BG2_recrG[i];
   }
   
   Recr_G ~ poisson_log(lambda_G);  
@@ -289,16 +295,18 @@ model{
   b_NG_survK ~ normal( 0 , 1 );
   Intercept_survK ~ normal( 2, 2 ); // killifish survival is atleast that of guppies
   b_BK1_survK ~ normal( 0 , 1 );
-  b_BK2_survK ~ normal( 0 , 1 );
+  // b_BK2_survK ~ normal( 0 , 1 );
   b_BG1_survK ~ normal( 0 , 1 );
-  b_BG2_survK ~ normal( 0 , 1 );
+  // b_BG2_survK ~ normal( 0 , 1 );
   
   for ( i in 1:N_survK ) {
     p_survK[i] = Intercept_survK + b_NG_survK * NG_survK[i] + b_z_survK * z_survK[i] + 
     b_zNG_survK* NG_survK[i] * z_survK[i] + v_Intercept_survK[stream_survK[i]] + 
     b_canopy_survK * canopy_survK[i] + 
-    b_BK1_survK * BK1_survK[i] + b_BK2_survK * BK2_survK[i] + 
-    b_BG1_survK * BG1_survK[i] + b_BG2_survK * BG2_survK[i];
+    b_BK1_survK * BK1_survK[i] +
+    // b_BK2_survK * BK2_survK[i] + 
+    b_BG1_survK * BG1_survK[i];
+    // + b_BG2_survK * BG2_survK[i];
     
     p_survK[i] = inv_logit(p_survK[i]);
   }
@@ -315,17 +323,19 @@ model{
   b_NG_growK ~ normal( 0 , 1 );
   Intercept_growK ~ normal( 18 , 10 );
   b_BK1_growK ~ normal( 0 , 1 );
-  b_BK2_growK ~ normal( 0 , 1 );
+  // b_BK2_growK ~ normal( 0 , 1 );
   b_BG1_growK ~ normal( 0 , 1 );
-  b_BG2_growK ~ normal( 0 , 1 );
+  // b_BG2_growK ~ normal( 0 , 1 );
   
   for ( i in 1:N_growK ) {
     mu_growK[i] = Intercept_growK + b_NG_growK * NG_growK[i] + 
     b_z_growK * z_growK[i] + b_z2_growK * z2_growK[i]  + b_zNG_growK * NG_growK[i] * z_growK[i] + 
     v_Intercept_growK[stream_growK[i]] + 
     b_canopy_growK * canopy_growK[i] + 
-    b_BK1_growK*BK1_growK[i] + b_BK2_growK*BK2_growK[i] + 
-    b_BG1_growK*BG1_growK[i] + b_BG2_growK*BG2_growK[i];
+    b_BK1_growK*BK1_growK[i] + 
+    // b_BK2_growK*BK2_growK[i] + 
+    b_BG1_growK*BG1_growK[i]; 
+    // + b_BG2_growK*BG2_growK[i];
   }
   
   z1_K ~ normal( mu_growK , sigma_growK );
@@ -339,17 +349,19 @@ model{
   b_NG_recrK ~ normal( 0 , 1 );
   Intercept_recrK ~ normal( 0 , 2 );
   b_BK1_recrK ~ normal( 0 , 1 );
-  b_BK2_recrK ~ normal( 0 , 1 );
+  // b_BK2_recrK ~ normal( 0 , 1 );
   b_BG1_recrK ~ normal( 0 , 1 );
-  b_BG2_recrK ~ normal( 0 , 1 );
+  // b_BG2_recrK ~ normal( 0 , 1 );
   
   for ( i in 1:N_recrK ) {
     lambda_K[i] = Intercept_recrK + b_NG_recrK * NG_recrK[i] + b_z_recrK * z_recrK[i] + 
     b_zNG_recrK * NG_recrK[i] * z_recrK[i] + 
     v_Intercept_recrK[stream_recrK[i]] + 
     b_canopy_recrK * canopy_recrK[i] + 
-    b_BK1_recrK * BK1_recrK[i] + b_BK2_recrK * BK2_recrK[i] + 
-    b_BG1_recrK * BG1_recrK[i] + b_BG2_recrK * BG2_recrK[i];
+    b_BK1_recrK * BK1_recrK[i] +
+    // + b_BK2_recrK * BK2_recrK[i] + 
+    b_BG1_recrK * BG1_recrK[i];
+    // + b_BG2_recrK * BG2_recrK[i];
   }
   
   Recr_K ~ poisson_log(lambda_K);
