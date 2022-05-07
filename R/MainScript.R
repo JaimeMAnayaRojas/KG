@@ -51,16 +51,23 @@ Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
 
 Gdata$FishBiom <- Gdata$BiomassG1 + Gdata$BiomassK1
 Kdata$FishBiom <- Kdata$BiomassG1 + Kdata$BiomassK1
-
 meanC = mean(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
 sdC = sd(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
-
-
-
 Gdata$FishBiom <- (Gdata$FishBiom - meanC) /  sdC
 Kdata$FishBiom <- (Kdata$FishBiom - meanC) /  sdC
 
 
+# fish density biomass/Area
+
+Gdata$FishDen <- Gdata$FishBiom  / Gdata$area
+Kdata$FishDen <- Kdata$FishBiom  / Kdata$area
+
+meanC = mean(unique(c(Gdata$FishDen, Kdata$FishDen ) ))
+sdC = sd(unique(c(Gdata$FishDen, Kdata$FishDen ) ))
+Gdata$FishDen <- (Gdata$FishDen - meanC) /  sdC
+Kdata$FishDen <- (Kdata$FishDen - meanC) /  sdC
+
+#
 
 
 meanC = mean(unique(c(Gdata$canopy, Kdata$canopy) ))
@@ -116,7 +123,7 @@ data_stan = list(
   BK2_survG = Gdata$K2s,
   BG1_survG = Gdata$G1s,
   BG2_survG = Gdata$G2s,
-  FB_survG = Gdata$FishBiom,
+  FB_survG = Gdata$FishDen,
   
 
   # Guppy: growth -----------------------------------------------------------
@@ -129,7 +136,7 @@ data_stan = list(
   BK2_growG = Gdata$K2s[which(Gdata$surv ==1)],
   BG1_growG = Gdata$G1s[which(Gdata$surv ==1)],
   BG2_growG = Gdata$G2s[which(Gdata$surv ==1)],
-  FB_growG = Gdata$FishBiom[which(Gdata$surv ==1)],
+  FB_growG = Gdata$FishDen[which(Gdata$surv ==1)],
   
   
   # Guppy: Reproduction data ------------------------------------------------
@@ -143,7 +150,7 @@ data_stan = list(
   BK2_recrG = Gdata$K2s[which(Gdata$Repr ==1)],
   BG1_recrG = Gdata$G1s[which(Gdata$Repr ==1)],
   BG2_recrG = Gdata$G2s[which(Gdata$Repr ==1)],
-  FB_recrG = Gdata$FishBiom[which(Gdata$Repr ==1)],
+  FB_recrG = Gdata$FishDen[which(Gdata$Repr ==1)],
   
   # Killifish: survival data ------------------------------------------------
   
@@ -156,7 +163,7 @@ data_stan = list(
   BK2_survK = Kdata$K2s,
   BG1_survK = Kdata$G1s,
   BG2_survK = Kdata$G2s,
-  FB_survK = Kdata$FishBiom,
+  FB_survK = Kdata$FishDen,
   
   
   
@@ -172,7 +179,7 @@ data_stan = list(
   BK2_growK = Kdata$K2s[which(Kdata$surv ==1)],
   BG1_growK = Kdata$G1s[which(Kdata$surv ==1)],
   BG2_growK = Kdata$G2s[which(Kdata$surv ==1)],
-  FB_growK = Kdata$FishBiom[which(Kdata$surv ==1)],
+  FB_growK = Kdata$FishDen[which(Kdata$surv ==1)],
   
   
   # Killifish: Reproduction data --------------------------------------------
@@ -187,7 +194,7 @@ data_stan = list(
   BK2_recrK = Kdata$K2s[which(Kdata$Repr ==1)],
   BG1_recrK = Kdata$G1s[which(Kdata$Repr ==1)],
   BG2_recrK = Kdata$G2s[which(Kdata$Repr ==1)],
-  FB_recrK = Kdata$FishBiom[which(Kdata$Repr ==1)]
+  FB_recrK = Kdata$FishDen[which(Kdata$Repr ==1)]
   
 
   
