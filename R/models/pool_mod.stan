@@ -149,7 +149,7 @@ model{
   b_z_survG ~ normal( 0 , 1 );
   b_NK_survG ~ normal( 0 , 1 );
   Intercept_survG ~ normal( 2.6 , 3 ); //  
-  b_FB_survG ~ normal( 0 , 1 );
+  
   
   // I use priors from Bassar 2017 evolution
   
@@ -193,7 +193,7 @@ model{
   for ( i in 1:N_recrG ) {
     lambda_G[i] = Intercept_recrG + b_NK_recrG * NK_recrG[i] + b_z_recrG * z_recrG[i] + 
     b_zNK_recrG * NK_recrG[i] * z_recrG[i] + 
-    v_Intercept_recrG[stream_recrG[i];
+    v_Intercept_recrG[stream_recrG[i]];
   }
   
   Recr_G ~ poisson_log(lambda_G);  
