@@ -194,7 +194,7 @@ data_stan = list(
   BK2_recrK = Kdata$K2s[which(Kdata$surv ==1)],
   BG1_recrK = Kdata$G1s[which(Kdata$surv ==1)],
   BG2_recrK = Kdata$G2s[which(Kdata$surv ==1)],
-  FB_recrK = Kdata$FishDen[which(Kdata$Resurvpr ==1)]
+  FB_recrK = Kdata$FishDen[which(Kdata$surv ==1)]
   
 
   
