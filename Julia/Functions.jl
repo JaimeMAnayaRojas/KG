@@ -90,7 +90,6 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 		:Intercept_growG => :"α_grow",
 		:b_z_growG => :"βz_grow",
 		:sigma_growG => :σ_grow,
-
 		:Intercept_recrG => :"α_fec",
 		:b_z_recrG => :"βz_fec"
 	)
