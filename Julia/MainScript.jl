@@ -8,8 +8,6 @@ using RCall
 using Plots
 using Plots.Measures
 
-
-
 # Set the working directory to my folder
 cd("$(homedir())")
 cd("Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
