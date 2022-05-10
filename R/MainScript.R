@@ -130,16 +130,16 @@ data_stan = list(
   
   # Guppy: Reproduction data ------------------------------------------------
   
-  Recr_G = Gdata$Recr[which(Gdata$Repr ==1)],
-  z_recrG = Gdata$z[which(Gdata$Repr ==1)],
-  NK_recrG = Gdata$NK[which(Gdata$Repr ==1)],
-  stream_recrG = Gdata$stream[which(Gdata$Repr ==1)],
-  canopy_recrG = Gdata$canopy[which(Gdata$Repr ==1)],
-  BK1_recrG = Gdata$K1s[which(Gdata$Repr ==1)],
-  BK2_recrG = Gdata$K2s[which(Gdata$Repr ==1)],
-  BG1_recrG = Gdata$G1s[which(Gdata$Repr ==1)],
-  BG2_recrG = Gdata$G2s[which(Gdata$Repr ==1)],
-  area_recrG = Gdata$area[which(Gdata$Repr ==1)],
+  Recr_G = Gdata$Recr[which(Gdata$surv ==1)],
+  z_recrG = Gdata$z[which(Gdata$surv ==1)],
+  NK_recrG = Gdata$NK[which(Gdata$surv ==1)],
+  stream_recrG = Gdata$stream[which(Gdata$surv ==1)],
+  canopy_recrG = Gdata$canopy[which(Gdata$surv ==1)],
+  BK1_recrG = Gdata$K1s[which(Gdata$surv ==1)],
+  BK2_recrG = Gdata$K2s[which(Gdata$surv ==1)],
+  BG1_recrG = Gdata$G1s[which(Gdata$surv ==1)],
+  BG2_recrG = Gdata$G2s[which(Gdata$surv ==1)],
+  area_recrG = Gdata$area[which(Gdata$surv ==1)],
   
   # Killifish: survival data ------------------------------------------------
   
@@ -174,16 +174,16 @@ data_stan = list(
   # Killifish: Reproduction data --------------------------------------------
   
   
-  Recr_K = Kdata$Recr[which(Kdata$Repr ==1)],
-  z_recrK = Kdata$z[which(Kdata$Repr ==1)],
-  NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
-  stream_recrK = Kdata$stream[which(Kdata$Repr ==1)],
-  canopy_recrK = Kdata$canopy[which(Kdata$Repr ==1)],
-  BK1_recrK = Kdata$K1s[which(Kdata$Repr ==1)],
-  BK2_recrK = Kdata$K2s[which(Kdata$Repr ==1)],
-  BG1_recrK = Kdata$G1s[which(Kdata$Repr ==1)],
-  BG2_recrK = Kdata$G2s[which(Kdata$Repr ==1)],
-  area_recrK = Kdata$area[which(Kdata$Repr ==1)]
+  Recr_K = Kdata$Recr[which(Kdata$surv ==1)],
+  z_recrK = Kdata$z[which(Kdata$surv ==1)],
+  NG_recrK = Kdata$NG[which(Kdata$surv ==1)],
+  stream_recrK = Kdata$stream[which(Kdata$surv ==1)],
+  canopy_recrK = Kdata$canopy[which(Kdata$surv ==1)],
+  BK1_recrK = Kdata$K1s[which(Kdata$surv ==1)],
+  BK2_recrK = Kdata$K2s[which(Kdata$surv ==1)],
+  BG1_recrK = Kdata$G1s[which(Kdata$surv ==1)],
+  BG2_recrK = Kdata$G2s[which(Kdata$surv ==1)],
+  area_recrK = Kdata$area[which(Kdata$surv ==1)]
   
 
   
