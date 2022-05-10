@@ -47,26 +47,47 @@ Kdata$Recr[which(Kdata$Repr==0 & Kdata$surv ==1)] = 0
 
 
 
-# Normalize the covariates (killifish biomass and canopy) -----------------
+# Normalize the covariates within streams -----------------
 
 Gdata$FishBiom <- Gdata$BiomassG1 + Gdata$BiomassK1
 Kdata$FishBiom <- Kdata$BiomassG1 + Kdata$BiomassK1
 
-meanC = mean(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
-sdC = sd(unique(c(Gdata$FishBiom, Kdata$FishBiom ) ))
+Gdata$Density <-( Gdata$BiomassG1 + Gdata$BiomassK1) / Gdata$area
+Kdata$Density <- (Kdata$BiomassG1 + Kdata$BiomassK1) / Kdata$area
+
+
+library("plyr")
+names(Gdata)
+vars = c("site", "Location", "Pool_1", "area", "FishBiom", "canopy", "Density")
+df = rbind(Gdata[,vars], Kdata[,vars])
+df = ddply(df,c('site','Location','Pool_1'),summarise, area=mean(area), Biomass=mean(FishBiom), canopy=mean(canopy), Density = mean(Density))
+
+means = ddply(df,c('Location'),summarise, mean_area=mean(area), mean_Biomass=mean(Biomass), mean_canopy=mean(canopy), mean_Density= mean(Density))
+sd = ddply(df,c('Location'),summarise, sd_area=sd(area), sd_Biomass=sd(Biomass), sd_canopy=sd(canopy), sd_Density= sd(Density))
+
+Gdata = merge(Gdata, means, by.x = "Location")
+Gdata = merge(Gdata, sd, by.x = "Location")
+
+Kdata = merge(Kdata, means, by.x = "Location")
+Kdata = merge(Kdata, sd, by.x = "Location")
 
 
 
-Gdata$FishBiom <- (Gdata$FishBiom - meanC) /  sdC
-Kdata$FishBiom <- (Kdata$FishBiom - meanC) /  sdC
+
+Gdata$FishBiom <- (Gdata$FishBiom - Gdata$mean_Biomass) /  Gdata$sd_Biomass
+Kdata$FishBiom <- (Kdata$FishBiom - Kdata$mean_Biomass) /  Kdata$sd_Biomass
+
+Gdata$area <- (Gdata$area - Gdata$mean_area) /  Gdata$sd_area
+Kdata$area <- (Kdata$area - Kdata$mean_area) /  Kdata$sd_area
 
 
+Gdata$canopy <- (Gdata$canopy - Gdata$mean_canopy) /  Gdata$sd_canopy
+Kdata$canopy <- (Kdata$canopy - Kdata$mean_canopy) /  Kdata$sd_canopy
 
 
-meanC = mean(unique(c(Gdata$canopy, Kdata$canopy) ))
-sdC = sd(unique(c(Gdata$canopy, Kdata$canopy) ))
-Gdata$canopy <- (Gdata$canopy - meanC) /  sdC
-Kdata$canopy <- (Kdata$canopy - meanC) /  sdC
+Gdata$Density <- (Gdata$Density - Gdata$mean_Density) /  Gdata$sd_Density
+Kdata$Density <- (Kdata$Density - Kdata$mean_Density) /  Kdata$sd_Density
+
 
 
 
