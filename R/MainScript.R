@@ -132,10 +132,6 @@ data_stan = list(
   NK_survG = Gdata$NK,
   stream_survG = Gdata$stream,
   canopy_survG = Gdata$canopy,
-  BK1_survG = Gdata$K1s,
-  BK2_survG = Gdata$K2s,
-  BG1_survG = Gdata$G1s,
-  BG2_survG = Gdata$G2s,
   area_survG = Gdata$area,
   
 
@@ -145,10 +141,6 @@ data_stan = list(
   NK_growG = Gdata$NK[which(Gdata$surv ==1)],
   stream_growG = Gdata$stream[which(Gdata$surv ==1)],
   canopy_growG = Gdata$canopy[which(Gdata$surv ==1)],
-  BK1_growG = Gdata$K1s[which(Gdata$surv ==1)],
-  BK2_growG = Gdata$K2s[which(Gdata$surv ==1)],
-  BG1_growG = Gdata$G1s[which(Gdata$surv ==1)],
-  BG2_growG = Gdata$G2s[which(Gdata$surv ==1)],
   area_growG = Gdata$area[which(Gdata$surv ==1)],
   
   
@@ -159,10 +151,6 @@ data_stan = list(
   NK_recrG = Gdata$NK[which(Gdata$surv ==1)],
   stream_recrG = Gdata$stream[which(Gdata$surv ==1)],
   canopy_recrG = Gdata$canopy[which(Gdata$surv ==1)],
-  BK1_recrG = Gdata$K1s[which(Gdata$surv ==1)],
-  BK2_recrG = Gdata$K2s[which(Gdata$surv ==1)],
-  BG1_recrG = Gdata$G1s[which(Gdata$surv ==1)],
-  BG2_recrG = Gdata$G2s[which(Gdata$surv ==1)],
   area_recrG = Gdata$area[which(Gdata$surv ==1)],
   
   # Killifish: survival data ------------------------------------------------
@@ -172,10 +160,6 @@ data_stan = list(
   NG_survK = Kdata$NG,
   stream_survK = Kdata$stream,
   canopy_survK = Kdata$canopy,
-  BK1_survK = Kdata$K1s,
-  BK2_survK = Kdata$K2s,
-  BG1_survK = Kdata$G1s,
-  BG2_survK = Kdata$G2s,
   area_survK = Kdata$area,
   
   
@@ -188,10 +172,6 @@ data_stan = list(
   NG_growK = Kdata$NG[which(Kdata$surv ==1)],
   stream_growK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_growK = Kdata$canopy[which(Kdata$surv ==1)],
-  BK1_growK = Kdata$K1s[which(Kdata$surv ==1)],
-  BK2_growK = Kdata$K2s[which(Kdata$surv ==1)],
-  BG1_growK = Kdata$G1s[which(Kdata$surv ==1)],
-  BG2_growK = Kdata$G2s[which(Kdata$surv ==1)],
   area_growK = Kdata$area[which(Kdata$surv ==1)],
   
   
@@ -203,10 +183,6 @@ data_stan = list(
   NG_recrK = Kdata$NG[which(Kdata$surv ==1)],
   stream_recrK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_recrK = Kdata$canopy[which(Kdata$surv ==1)],
-  BK1_recrK = Kdata$K1s[which(Kdata$surv ==1)],
-  BK2_recrK = Kdata$K2s[which(Kdata$surv ==1)],
-  BG1_recrK = Kdata$G1s[which(Kdata$surv ==1)],
-  BG2_recrK = Kdata$G2s[which(Kdata$surv ==1)],
   area_recrK = Kdata$area[which(Kdata$surv ==1)]
   
 
