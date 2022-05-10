@@ -114,12 +114,12 @@ data_stan = list(
   N_survG = length(Gdata$surv),
   N_growG = length(which(Gdata$surv ==1)),
   N_repG = length(which(Gdata$surv ==1)),
-  N_recrG = length(which(Gdata$Repr ==1)),
+  N_recrG = length(which(Gdata$surv ==1)),
   
   N_survK = length(Kdata$surv),
   N_growK = length(which(Kdata$surv ==1)),
   N_repK = length(which(Kdata$surv ==1)),
-  N_recrK = length(which(Kdata$Repr ==1)),
+  N_recrK = length(which(Kdata$surv ==1)),
   
   N_stream =  length(unique(Gdata$stream)),
   
@@ -199,7 +199,7 @@ data_stan = list(
   
   Recr_K = Kdata$Recr[which(Kdata$surv ==1)],
   z_recrK = Kdata$z[which(Kdata$surv ==1)],
-  NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
+  NG_recrK = Kdata$NG[which(Kdata$surv ==1)],
   stream_recrK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_recrK = Kdata$canopy[which(Kdata$surv ==1)],
   BK1_recrK = Kdata$K1s[which(Kdata$surv ==1)],
