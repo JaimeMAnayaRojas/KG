@@ -114,12 +114,12 @@ data_stan = list(
   N_survG = length(Gdata$surv),
   N_growG = length(which(Gdata$surv ==1)),
   N_repG = length(which(Gdata$surv ==1)),
-  N_recrG = length(which(Gdata$Repr ==1)),
+  N_recrG = length(which(Gdata$surv ==1)),
   
   N_survK = length(Kdata$surv),
   N_growK = length(which(Kdata$surv ==1)),
   N_repK = length(which(Kdata$surv ==1)),
-  N_recrK = length(which(Kdata$Repr ==1)),
+  N_recrK = length(which(Kdata$surv ==1)),
   
   N_stream =  length(unique(Gdata$stream)),
   
