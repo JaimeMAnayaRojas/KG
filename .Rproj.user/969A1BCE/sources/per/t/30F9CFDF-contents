@@ -90,6 +90,8 @@ Kdata$Density <- (Kdata$Density - Kdata$mean_Density) /  Kdata$sd_Density
 
 
 
+
+
 # Re-code the random effects (drainage id) --------------------------------
 
 
