@@ -76,12 +76,11 @@ function Guppy_IPM(post; nBigMatrix = 100, min_size = 4, max_size = 35, size_cen
 	pars_KG_G = select(post,
     	:Intercept_survG => :"α_surv",
     	:b_z_survG => :"βz_surv",
-     	:Intercept_growG => :"α_grow",
+    	:Intercept_growG => :"α_grow",
     	:b_z_growG => :"βz_grow",
-    	:b_canopy_growG => :"β_canopy_grow",
-		:sigma_growG => :σ_grow,
-		:Intercept_recrG => :"α_fec",
-    	:b_z_recrG => :"βz_fec"
+    	:sigma_growG => :σ_grow,
+    	:Intercept_recrG => :"α_fec",
+    	:b_z_recrG => :"βz_fec",
 	)		
 
 
@@ -375,7 +374,7 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
     pars_GR_K = select(post,
 		:Intercept_survK => :"α_surv",
         :b_z_survK => :"βz_surv",
-         :Intercept_growK => :"α_grow",
+        :Intercept_growK => :"α_grow",
         :b_z_growK => :"βz_grow",
 		:b_z2_growK => :"βz2_grow",
         :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
@@ -391,10 +390,10 @@ function Killifish_IPM(post; nBigMatrix = 100, min_size = 2, max_size = 110,
         :Intercept_growK => :"α_grow",
         :b_z_growK => :"βz_grow",
 		:b_z2_growK => :"βz2_grow",
-        :sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
+       	:sigma_growK => ByRow(x-> sqrt(x)) =>:σ_grow,
         :Intercept_recrK => :"α_fec",
         :b_z_recrK => :"βz_fec"
-    )
+	)
   
   
   
