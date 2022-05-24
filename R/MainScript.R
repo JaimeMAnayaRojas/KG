@@ -1,6 +1,7 @@
 ####  
 library(rethinking)
 library(data.table)
+library(brms)
 rm(list=ls(all=TRUE))
 
 # Functions
@@ -16,7 +17,7 @@ LOS <- function(x=NULL){
 ###########################################################################################################
 # First get the data
 getwd()
-setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
+#setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 
 
 center = 18
@@ -103,6 +104,10 @@ Gdata$stream <- as.numeric(Gdata$stream)
 
 Gdata$growth = log(Gdata$SL2_mm/Gdata$SL1_mm)
 Kdata$growth = log(Kdata$SL2_mm/Kdata$SL1_mm)
+
+
+
+
 
 # Collect the data for the stan model -------------------------------------
 

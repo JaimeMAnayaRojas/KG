@@ -1,6 +1,7 @@
 ####  
 library(rethinking)
 library(data.table)
+library(brms)
 rm(list=ls(all=TRUE))
 
 # Functions
@@ -16,7 +17,7 @@ LOS <- function(x=NULL){
 ###########################################################################################################
 # First get the data
 getwd()
-setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
+#setwd("~/Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
 
 
 center = 18
@@ -90,8 +91,6 @@ Kdata$Density <- (Kdata$Density - Kdata$mean_Density) /  Kdata$sd_Density
 
 
 
-
-
 # Re-code the random effects (drainage id) --------------------------------
 
 
@@ -106,6 +105,10 @@ Gdata$stream <- as.numeric(Gdata$stream)
 Gdata$growth = log(Gdata$SL2_mm/Gdata$SL1_mm)
 Kdata$growth = log(Kdata$SL2_mm/Kdata$SL1_mm)
 
+
+
+
+
 # Collect the data for the stan model -------------------------------------
 
 data_stan = list(
@@ -116,12 +119,12 @@ data_stan = list(
   N_survG = length(Gdata$surv),
   N_growG = length(which(Gdata$surv ==1)),
   N_repG = length(which(Gdata$surv ==1)),
-  N_recrG = length(which(Gdata$Repr ==1)),
+  N_recrG = length(which(Gdata$surv ==1)),
   
   N_survK = length(Kdata$surv),
   N_growK = length(which(Kdata$surv ==1)),
   N_repK = length(which(Kdata$surv ==1)),
-  N_recrK = length(which(Kdata$Repr ==1)),
+  N_recrK = length(which(Kdata$surv ==1)),
   
   N_stream =  length(unique(Gdata$stream)),
   
@@ -201,7 +204,7 @@ data_stan = list(
   
   Recr_K = Kdata$Recr[which(Kdata$surv ==1)],
   z_recrK = Kdata$z[which(Kdata$surv ==1)],
-  NG_recrK = Kdata$NG[which(Kdata$Repr ==1)],
+  NG_recrK = Kdata$NG[which(Kdata$surv ==1)],
   stream_recrK = Kdata$stream[which(Kdata$surv ==1)],
   canopy_recrK = Kdata$canopy[which(Kdata$surv ==1)],
   BK1_recrK = Kdata$K1s[which(Kdata$surv ==1)],
