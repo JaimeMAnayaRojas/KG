@@ -40,7 +40,7 @@ Model_selection <- function(Full_model, name, species){
                   mod_lis[rownames(tab)[7]]$formula[1]$formula[3]
   )
   
-  write.csv(tab, paste("outputs/",name, ".csv", sep = ""))
+  write.csv(tab, paste("outputs/",name, "_" ,species,".csv", sep = ""))
   
 
   return(get(rownames(tab)[1]))

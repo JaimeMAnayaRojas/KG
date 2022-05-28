@@ -1,3 +1,4 @@
+
 using Distributions
 using CSV
 using DataFrames
@@ -7,74 +8,81 @@ using JLD2
 using RCall
 using Plots
 using Plots.Measures
+using LaTeXStrings
+using KernelDensity
 
-
-
-# Set the working directory to my folder
-cd("$(homedir())")
-cd("Dropbox/Jaime M/Projects_JM/FSU/Pool_manipulation/KG_git/")
-pwd()
 
 # load my functions
 include("Functions.jl")
+readdir("outputs")
+post_SurvG = CSV.read("outputs/Post_Survival_G.csv", DataFrame)# Statistical analyses
+post_GrowthG = CSV.read("outputs/Post_Growth_G.csv", DataFrame)# Statistical analyses
+post_ReprG = CSV.read("outputs/Post_Repr_G.csv", DataFrame)# Statistical analyses
 
-# Run the Bayesian model via rstan.
-R"""
-    source("R/MainScript.R")
-"""
-@rget post
-
-
-# Load the posteriors from the model
-post = CSV.read("outputs/Posteriors.csv", DataFrame)
-# I am running the models in stan via R, and getting the posteriors for the guppy and killifish IPM# 
+post_SurvK = CSV.read("outputs/Post_Survival_K.csv", DataFrame)# Statistical analyses
+post_GrowthK = CSV.read("outputs/Post_Growth_K.csv", DataFrame)# Statistical analyses
 
 
- 
-
-# Test the IPM functions, 
-# This also helps compiling the functions early and then the calculation faster. 
-# In Julia the first time a function is used it takes a bit of time, after that it becomes faster and faster
-# Run both IPM models
-
-@time Guppy_IPM(post[1:3,:]; nBigMatrix = 100, min_size = 2, max_size = 45, size_cen = 18.0) # 
-@time Killifish_IPM(post[1:2,:]; nBigMatrix = 100, min_size = 2, max_size = 110, size_cen = 18.0)
+readdir("data")
+DataG = CSV.read("data/GuppyIPM.csv", DataFrame);
+DataK = CSV.read("data/KillifishIPM.csv", DataFrame);
 
 
-nBigMatrix = 100
-IPMs = [Guppy_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 45, size_cen = 18.0),
-Killifish_IPM(post; nBigMatrix = nBigMatrix, min_size = 2, max_size = 110, size_cen = 18.0)]
 
-## Save the IPMs
-@save "outputs/IPMs.jld2" IPMs  
+a = filter(:KG => x -> x == 1, DataG)
+pSG = histogram(a.SL1_mm, label = "KG", bins= 50, alpha = 0.5, 
+title = "a) Guppy", titlefont = font(10), titleloc = :left)
+a = filter(:NK => x -> x == 1, DataG)
+histogram!(a.SL1_mm, label = "NK", bins= 50, alpha = 0.5)
 
-## load the IPMs
-@load "outputs/IPMs.jld2" IPMs  
-
-
-##### Figures vital rates
-
-f1 = include("Man_plots.jl")
-savefig(f1, "plots/Figure 1.png")
-
-sTab[1][:,:Species] = fill("Guppy", size(sTab[1])[1])
-sTab[2][:,:Species] = fill("Kilifish", size(sTab[2])[1])
-sumTab = sTab[1]
-append!(sumTab, sTab[2])
-println(sumTab)
-CSV.write("outputs/Summary_statsIPM.csv", sumTab )
-
-
-include("Figure_2.jl")
-ylabel!("LOS (%) \n ΔV > 0 ")
-savefig("plots/Figure 2.png")
-
-
-include("Figure S.jl")
-savefig("plots/Figure S2.png")
-
+a = filter(:KG => x -> x == 1, DataK)
+pSK = histogram(a.SL1_mm, label = "KG", titlefont = font(10),  
+bins= 50, title = "b) Killifish", titleloc = :left, alpha = 0.5)
+a = filter(:NG => x -> x == 1, DataK)
+histogram!(a.SL1_mm, label = "NG",  bins= 50, alpha = 0.5)
 
 plot(pSG, pSK, layout = (2,1))
 xlabel!("Size (mm)")
 ylabel!("Frequency (N)")
-savefig("plots/Figure S1.png")
+
+
+
+
+
+########333
+
+
+function p_link(df::AbstractDataFrame, z::AbstractVector, 
+    size_cen::AbstractFloat, NK::Integer, row::Integer)
+    zc = z .- size_cen
+    z2 = z.^2 .- size_cen.^2
+    α= df.b_Intercept[row]
+    βz= df.b_z[row]
+    βz2= df.b_z2[row]
+    βNK= df."b_NK"[row]
+    βzNK= df."b_z.NK"[row]
+    μ = α .+ βNK .* NK .+  (βz .+ βzNK .* NK) .* zc .+ βz2 .* z2  # linear predictor
+    return(μ)
+end
+
+
+
+function p_linkK(df::AbstractDataFrame, z::AbstractVector, 
+    size_cen::AbstractFloat, NG::Integer, row::Integer)
+    zc = z .- size_cen
+    α= df.b_Intercept[row]
+    βz= df.b_z[row]
+    βNG= df."b_NG"[row]
+    βzNG= df."b_z.NG"[row]
+    μ = α .+ βNG .* NG .+  (βz .+ βzNG .* NG) .* zc  # linear predictor
+    return(μ)
+end
+
+
+include("Figures_Guppy.jl")
+savefig("Figure-1.png")
+
+
+
+include("Figures_Killifish.jl")
+savefig("Figure-2.png")
